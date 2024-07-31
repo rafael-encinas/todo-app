@@ -37,9 +37,9 @@ function SearchBar(){
   );
 }
 
-function NewToDoBtn(){
+function NewToDoBtn({ toggleModal }){
   return(
-    <button className='newToDoBtn generalBtn'>+ New To Do</button>
+    <button className='newToDoBtn generalBtn' onClick={toggleModal}>+ New To Do</button>
   );
 }
 
@@ -137,13 +137,13 @@ function Metrics(){
   )
 }
 
-function NewTodoModal(){
+function NewTodoModal({ toggleModal }){
   return(
     <div className='newToDoModal'>
       <div>New "To Do"</div>
       <div className='inputContainer'>
         <label htmlFor="">Text:</label>
-        <textarea name="" id="" required></textarea>
+        <textarea name="" id="" required rows={3}></textarea>
       </div>
       <div className='inputContainer'>
       <label >Priority: </label>
@@ -158,7 +158,7 @@ function NewTodoModal(){
         <input type="date" name="" id="" />
       </div>
       <div className='btnsContainer'>
-        <button className='generalBtn'>Cancel</button>
+        <button className='generalBtn' onClick={toggleModal}>Cancel</button>
         <button className='generalBtn saveTodoBtn'>Save</button>
       </div>
     </div>
@@ -166,6 +166,7 @@ function NewTodoModal(){
 }
 
 function App() {
+  const [modalState, setModalState] = useState(false);
   let todosArr = [
     {id: 0, text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et efficitur risus. Nulla varius vehicula massa, sus.", dueDate: "2024/08/12", doneState: false, doneDate: "-", priority: "High", creationDate: "2024/07/29"},
     {id: 1, text: "Task 1", dueDate: "-", doneState: true, doneDate: "2022/02/01", priority: "Low", creationDate: "2022/01/15"},
@@ -179,14 +180,18 @@ function App() {
     {id: 9, text: "Task 9", dueDate: "-", doneState: true, doneDate: "2022/02/01", priority: "Low", creationDate: "2022/01/15"},
   ]
 
+  function toggleModal(){
+    setModalState(!modalState);
+  }
+
   return (
     <>
       <SearchBar />
-      <NewToDoBtn />
+      <NewToDoBtn toggleModal={toggleModal}  />
       <ToDosTable todosArr={todosArr} />
       <PaginationControl />
       <Metrics />
-      <NewTodoModal />
+      {modalState? <NewTodoModal toggleModal={toggleModal}/> :null}
     </>
   )
 }
