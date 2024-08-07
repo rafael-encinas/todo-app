@@ -52,13 +52,12 @@ public class TodoappApplication {
 		}
 
 		// Pagination test
-		/*
 		@GetMapping(value = "/pagination")
 		public ResponseEntity<Response> findPagination(@RequestParam Map<String,String> allParams){
 			Response response = repository.findPagination(allParams);
             return ResponseEntity.ok(response);
 		}
-		*/
+		
 
 		@PostMapping
 		public ResponseEntity<String> saveTodo(@RequestBody Todo todo){
@@ -88,12 +87,10 @@ public class TodoappApplication {
 			if(todo.getText().length() <= maxTextLength && todo.getText().length() >= minTextLength) {
 				textLengthCheck = true;
 			}
-			
 			boolean prioritySetCheck = false;
 			if(todo.getPriority() <= 2 && todo.getPriority() >= 0) {
 				prioritySetCheck = true;
 			}
-
 			if(textLengthCheck && prioritySetCheck) return ResponseEntity.ok(repository.updateTodo(id, todo));
 			
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("There was a problem with the request, please confirm that 'text' has at least 1 character, and at most 120 characters, and that a priority has been set.");
@@ -199,8 +196,6 @@ public class TodoappApplication {
 			System.out.println("Medium: " + medAverage);
 			System.out.println("High: " + highAverage);
 		}
-
-
 
 		private LocalDateTime stringToLDT(String date){
 			if(date.equals("null 00:00:00")){
@@ -355,9 +350,8 @@ public class TodoappApplication {
 			return arraylist;
 		}
 		
-		/*
-		Response findPagination(Map<String,String> allParams){
-
+		Response findPagination(Map<String,String> allParams){			
+			/*
 			 * Return: 
 			 *  - array[0, 9]
 			 *  - Total number of todos
@@ -365,12 +359,67 @@ public class TodoappApplication {
 			 *  - Total number of pages after filters: howManyTodos/10 -> Math.roundUp()/ceiling, etc...
 			 *  - metrics
 			 //Create a response object, todos, total numbers, metrics
-			 Response response = new Response(todos, null, null)
 			 List<Todo> paginatedList = todos.subList(0, 9);
-			 return paginatedList;
+			 */
+			//From allParams, filter todos arraylist
+			/* Parameters:
+				- page: for pagination
+				- sortByPriority, low=low, high=high;	- DONE
+				- sortByDate LocalDateTime a.isAfter(b), sooner, later
+				- priority: low=0, med=1, high=2, all=3 - DONE
+				- state:  undone=0, done=1, all=2,		- DONE
+				- text: text content					- DONE
+			*/
+			//output from one filter is fed as input for next filter
+
+			updateTimesArrays();
+			ArrayList<Todo> filterdArray = (ArrayList)todos.clone();
+			System.out.println(allParams);
+			//Sort by priority
+			if(allParams.containsKey("sortByPriority")) filterdArray = sortByPriority(filterdArray, allParams.get("sortByPriority"));
+			//Sort by date
+			if(allParams.containsKey("sortByDate")) filterdArray = sortByDate(filterdArray, allParams.get("sortByDate"));
+			//Filter by priority
+			if(allParams.containsKey("priority")) filterdArray = filterByPriority(filterdArray, allParams.get("priority"));
+			//Filter by state (done/undone)
+			if(allParams.containsKey("state")) filterdArray = filterByState(filterdArray, allParams.get("state"));
+			//Filter by text
+			if(allParams.containsKey("text")) filterdArray = filterByText(filterdArray, allParams.get("text"));
+			//filtered array must be split for pagination before being attached to response object
+			int currentPage; 
+			if(allParams.containsKey("page")) {
+				currentPage = Integer.valueOf(allParams.get("page"));
+			} else{
+				currentPage = 1;
+			}
+			//Checar si se puede cambiar 
+			int howManyElements = 10;
+			int fromIndex = 0 + (howManyElements*(currentPage-1));
+			int toIndex = 10 + (howManyElements*(currentPage-1));	//if toIndex > arr.size()-1 -> toIndex = arr.size()-1  
+			if(toIndex>filterdArray.size()){
+				toIndex = filterdArray.size();
+			}
+			System.out.println("******************************");
+			System.out.println("CurrentPage: " + currentPage);
+			System.out.println("FromIndex: " + fromIndex);
+			System.out.println("ToIndex: " + toIndex);
+
+			List<Todo> paginatedList = filterdArray.subList(fromIndex, toIndex);
+			int totalPages = (int) Math.ceil(filterdArray.size()/10.0);	//cambiar por howManyElements, castear de int a float
+			Integer nextPage = currentPage+1 <= totalPages ? currentPage+1 : -1;
+			Integer prevPage = currentPage-1 >= 1 ? currentPage-1 : -2;
+			
+			System.out.println("******************************");
+			System.out.println("TotalPages: " + totalPages);
+			System.out.println("NetPage: " + nextPage);
+			System.out.println("PrevPage: " + prevPage);
+			//Manejar en front casos de -1, y -2
+			Pagination pagination = new Pagination(todos.size(),filterdArray.size(),currentPage, totalPages, nextPage, prevPage);
+
+			Response response = new Response(paginatedList, pagination, null);
+			 return response;
 			}
 			
-		*/
 		String updateTodo(int id, Todo todo){
 			System.out.println("Trying to update todo with id: " + id);
 			System.out.println("Recieved request body: ");
@@ -492,18 +541,22 @@ public class TodoappApplication {
 	}
 
 	static class Response {
-		ArrayList<Todo> data;
+		List<Todo> data;
 		Pagination pagination;
 		Metrics metrics;
-		public Response(ArrayList<Todo> data, Pagination pagination, Metrics metrics) {
+		public Response(List<Todo> data, Pagination pagination, Metrics metrics) {
 			this.data = data;
 			this.pagination = pagination;
 			this.metrics = metrics;
 		}
-		public ArrayList<Todo> getData() {
+
+		public Response(){
+
+		}
+		public List<Todo> getData() {
 			return data;
 		}
-		public void setData(ArrayList<Todo> data) {
+		public void setData(List<Todo> data) {
 			this.data = data;
 		}
 		public Pagination getPagination() {
@@ -522,24 +575,41 @@ public class TodoappApplication {
 		
 		
 	}
+	
 	static class Pagination {
 		int total_records;
+		int total_filtered;
 		int current_page;
 		int total_pages;
-		int next_page;
-		int prev_page;
-		public Pagination(int total_records, int current_page, int total_pages, int next_page, int prev_page) {
+		Integer next_page;
+		Integer prev_page;
+
+		
+		public Pagination(int total_records, int total_filtered, int current_page, int total_pages, Integer next_page,
+				Integer prev_page) {
 			this.total_records = total_records;
+			this.total_filtered = total_filtered;
 			this.current_page = current_page;
 			this.total_pages = total_pages;
 			this.next_page = next_page;
 			this.prev_page = prev_page;
 		}
+
+		public Pagination(){
+
+		}
+
 		public int getTotal_records() {
 			return total_records;
 		}
 		public void setTotal_records(int total_records) {
 			this.total_records = total_records;
+		}
+		public int getTotal_filtered() {
+			return total_filtered;
+		}
+		public void setTotal_filtered(int total_filtered) {
+			this.total_filtered = total_filtered;
 		}
 		public int getCurrent_page() {
 			return current_page;
@@ -556,20 +626,17 @@ public class TodoappApplication {
 		public int getNext_page() {
 			return next_page;
 		}
-		public void setNext_page(int next_page) {
+		public void setNext_page(Integer next_page) {
 			this.next_page = next_page;
 		}
-		public int getPrev_page() {
+		public Integer getPrev_page() {
 			return prev_page;
 		}
-		public void setPrev_page(int prev_page) {
+		public void setPrev_page(Integer prev_page) {
 			this.prev_page = prev_page;
 		}
-
-		
 		
 	}
-
 	static class Metrics {
 		String overallAverage;
 		String lowPriorirtyAverage;
@@ -582,6 +649,10 @@ public class TodoappApplication {
 			this.lowPriorirtyAverage = lowPriorirtyAverage;
 			this.medPriorirtyAverage = medPriorirtyAverage;
 			this.highPriorityAverage = highPriorityAverage;
+		}
+
+		public Metrics(){
+
 		}
 
 		public String getOverallAverage() {
