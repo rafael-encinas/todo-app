@@ -239,6 +239,21 @@ public class TodoappApplication {
 			return seconds;
 		}
 
+		private String timeDiffStringFormatter(long seconds){
+			long minutes = Math.floorDiv(seconds, 60);			//seconds/60 math.floor
+			long restSeconds = seconds - (minutes*60);		//seconds for display = seconds - minutes *60
+			//DisplayMinutes if less than 10, add 0 to the left, same for seconds
+			String displayMinutes = Long.toString(minutes);
+			String displaySeconds = Long.toString(restSeconds);
+			if(minutes<10){
+				displayMinutes= "0"+displayMinutes;
+			} 
+			if(restSeconds<10){
+				displaySeconds= "0"+displaySeconds;
+			} 
+			return displayMinutes + ":" + displaySeconds;
+		}
+
 		String saveTodo(Todo todo){
 			todo.setId(lastId+1);
 			todo.setCreationDate(ldtToString(LocalDateTime.now()));
@@ -416,7 +431,14 @@ public class TodoappApplication {
 			//Manejar en front casos de -1, y -2
 			Pagination pagination = new Pagination(todos.size(),filterdArray.size(),currentPage, totalPages, nextPage, prevPage);
 
-			Response response = new Response(paginatedList, pagination, null);
+			String metricsOverallAvg = timeDiffStringFormatter(overallAverage);
+			String metricsLowAvg = timeDiffStringFormatter(lowAverage);
+			String metricsMedAvg = timeDiffStringFormatter(medAverage);
+			String metricsHighAvg = timeDiffStringFormatter(highAverage);
+
+			Metrics metrics = new Metrics(metricsOverallAvg, metricsLowAvg, metricsMedAvg, metricsHighAvg);
+
+			Response response = new Response(paginatedList, pagination, metrics);
 			 return response;
 			}
 			
