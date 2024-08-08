@@ -2,10 +2,7 @@ import { useState } from 'react'
 //import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-
-
-
-
+import { Counter } from './features/counter/Counter';
 
 function SearchBar(){
 
@@ -71,8 +68,8 @@ function ToDosTable({ todosArr }){
         <tr>
           <td className='colState'>State</td>
           <td className='colName'>Name</td>
-          <td className='colPriority'>Priority</td>
-          <td className='colDueDate'>Due Date</td>
+          <td className='colPriority'>Priority <button>^</button></td>
+          <td className='colDueDate'>Due Date <button>^</button></td>
           <td className='colActions'>Actions</td>
         </tr>
       </thead>
@@ -85,9 +82,10 @@ function ToDosTable({ todosArr }){
 }
 
 function ToDoRow({ toDo }){
+  let checked = toDo.doneState?"checked":null;
   return(
     <tr>          
-      <td><input type="checkbox" name="" id="" /></td> 
+      <td className='colState'><input type="checkbox" name="" id="" checked={toDo.doneState} /></td> 
       <td>{toDo.text}</td>  
       <td>{toDo.priority}</td> 
       <td>{toDo.dueDate}</td> 
@@ -175,7 +173,7 @@ function App() {
     {id: 4, text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et efficitur risus. Nulla varius vehicula massa, sus.", dueDate: "2024/08/12", doneState: false, doneDate: "-", priority: "High", creationDate: "2024/07/29"},
     {id: 5, text: "Task 5", dueDate: "-", doneState: true, doneDate: "2022/02/01", priority: "Low", creationDate: "2022/01/15"},
     {id: 6, text: "Task 6", dueDate: "2022/02/02", doneState: false, doneDate: "-", priority: "High", creationDate: "2022/01/18"},
-    {id: 7, text: "Task 7", dueDate: "2023/02/02", doneState: false, doneDate: "-", priority: "Medium", creationDate: "2022/01/04"},
+    {id: 7, text: "Task 7", dueDate: "2023/02/02", doneState: true, doneDate: "-", priority: "Medium", creationDate: "2022/01/04"},
     {id: 8, text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et efficitur risus. Nulla varius vehicula massa, sus.", dueDate: "2024/08/12", doneState: false, doneDate: "-", priority: "High", creationDate: "2024/07/29"},
     {id: 9, text: "Task 9", dueDate: "-", doneState: true, doneDate: "2022/02/01", priority: "Low", creationDate: "2022/01/15"},
   ]
@@ -190,6 +188,7 @@ function App() {
       <NewToDoBtn toggleModal={toggleModal}  />
       <ToDosTable todosArr={todosArr} />
       <PaginationControl />
+      <Counter />
       <Metrics />
       {modalState? <NewTodoModal toggleModal={toggleModal}/> :null}
     </>
