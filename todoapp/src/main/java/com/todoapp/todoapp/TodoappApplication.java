@@ -1,6 +1,5 @@
 package com.todoapp.todoapp;
 
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -12,7 +11,6 @@ import java.util.Map;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -42,6 +40,12 @@ public class TodoappApplication {
 		}
 
 		@GetMapping
+		public ResponseEntity<Response> findPagination(@RequestParam Map<String,String> allParams){
+			Response response = repository.findPagination(allParams);
+            return ResponseEntity.ok(response);
+		}
+
+		@GetMapping(value = "/getall")
 		public ResponseEntity<ArrayList<Todo>> findAll(@RequestParam Map<String,String> allParams){
 			ArrayList<Todo> todos = repository.findAll(allParams);
 			if (todos.isEmpty()){
@@ -50,18 +54,9 @@ public class TodoappApplication {
 			}
             return ResponseEntity.ok(todos);
 		}
-
-		// Pagination test
-		@GetMapping(value = "/pagination")
-		public ResponseEntity<Response> findPagination(@RequestParam Map<String,String> allParams){
-			Response response = repository.findPagination(allParams);
-            return ResponseEntity.ok(response);
-		}
 		
-
 		@PostMapping
 		public ResponseEntity<String> saveTodo(@RequestBody Todo todo){
-			// ResponseEntity.ok(repository.saveTodo(todo));
 			int maxTextLength = 120;
 			int minTextLength = 1;
 			boolean textLengthCheck = false;
@@ -102,7 +97,7 @@ public class TodoappApplication {
 			return ResponseEntity.ok(repository.markDone(id));
 		}
 		
-		//Put /todos/{id}/undone
+		//Put /todos/{id}/undone to mark "todo" as undone
 		@PutMapping("/{id}/undone")
 		public ResponseEntity<Todo> markUndone(@PathVariable int id) {
 			return ResponseEntity.ok(repository.markUndone(id));
@@ -119,10 +114,8 @@ public class TodoappApplication {
 		private ArrayList<Todo> todos = new ArrayList<>();
 		
 		int lastId=0;
-		//Predicate<Integer> deleteId = i-> i == 
 		private int getIndexFromId(int id){
 			int index=-1;
-
 			for(int i = 0; i < todos.size(); i++){
 				if(todos.get(i).getId() == id){
 					index = i;
@@ -151,6 +144,7 @@ public class TodoappApplication {
 		}
 
 		private void updateTimesArrays(){
+			//If any todo changed from done to undone, arrays must be reformed
 			lowPriorityTimes.clear();
 			medPriorityTimes.clear();
 			highPriorityTimes.clear();
@@ -191,6 +185,7 @@ public class TodoappApplication {
 			if(howManyCalculations>0){
 				overallAverage = tempSum/howManyCalculations;
 			}
+
 			System.out.println("Averaga overall time: "+ overallAverage);
 			System.out.println("Low: " + lowAverage);
 			System.out.println("Medium: " + medAverage);
@@ -199,7 +194,7 @@ public class TodoappApplication {
 
 		private LocalDateTime stringToLDT(String date){
 			if(date.equals("null 00:00:00")){
-				date = "9999-12-30 00:00:00";
+				date = "9999-12-30 00:00:00";	//Used when sorting todos by dueDate, if dueDate = null -> push to the end of time
 			}
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 			LocalDateTime dateTime = LocalDateTime.parse(date, formatter);
@@ -215,33 +210,14 @@ public class TodoappApplication {
 		private long timeDiffString(String creationDate, String doneDate){
 			LocalDateTime fromDate = stringToLDT(creationDate);
 			LocalDateTime finishDate = stringToLDT(doneDate);
-			//long minutes = ChronoUnit.MINUTES.between(fromDate, finishDate);
+			//Get time difference in seconds
 			long seconds = ChronoUnit.SECONDS.between(fromDate, finishDate);
-
-			//Possible split point into different method, 
-			long minutes = Math.floorDiv(seconds, 60);			//seconds/60 math.floor
-			long restSeconds = seconds - (minutes*60);		//seconds for display = seconds - minutes *60
-			//DisplayMinutes if less than 10, add 0 to the left, same for seconds
-			String displayMinutes = Long.toString(minutes);
-			String displaySeconds = Long.toString(restSeconds);
-			if(minutes<10){
-				displayMinutes= "0"+displayMinutes;
-			} 
-			if(restSeconds<10){
-				displaySeconds= "0"+displaySeconds;
-			} 
-
-			System.out.println("Creation date: " + creationDate);
-			System.out.println("Finish date: " + doneDate);
-			System.out.println("Total seconds: " + seconds);
-			System.out.println(displayMinutes + ":" + displaySeconds);
-			//String
 			return seconds;
 		}
 
 		private String timeDiffStringFormatter(long seconds){
-			long minutes = Math.floorDiv(seconds, 60);			//seconds/60 math.floor
-			long restSeconds = seconds - (minutes*60);		//seconds for display = seconds - minutes *60
+			long minutes = Math.floorDiv(seconds, 60);
+			long restSeconds = seconds - (minutes*60);
 			//DisplayMinutes if less than 10, add 0 to the left, same for seconds
 			String displayMinutes = Long.toString(minutes);
 			String displaySeconds = Long.toString(restSeconds);
@@ -259,7 +235,6 @@ public class TodoappApplication {
 			todo.setCreationDate(ldtToString(LocalDateTime.now()));
 			todos.add(todo);
 			lastId = lastId+1;
-			//System.out.println("New last id: " +lastId);
 			return "Todo created succesfully";
 		}
 
@@ -299,11 +274,8 @@ public class TodoappApplication {
 		}
 
 		private ArrayList<Todo> sortByDate(ArrayList<Todo> arraylist, String sortByDate){
-			// - sortByPriority, low=low, high=high;
-			Comparator<LocalDateTime> nullslastComparator = Comparator.nullsLast(Comparator.naturalOrder());
+			// - sortByDate, sooner dates first = "sooner", later dates first= anything else
 			if(sortByDate.equals("sooner")){
-				//(a, b) -> stringToLDT(a.getDueDate()+" 00:00:00").compareTo(stringToLDT(b.getDueDate()+" 00:00:00"))
-				//Converts todo.dueDate (String) into LocalDateTime object, then get compared
 				arraylist.sort(
 					Comparator.nullsLast(
 					(a, b) -> stringToLDT(a.getDueDate()+" 00:00:00").compareTo(stringToLDT(b.getDueDate()+" 00:00:00"))
@@ -311,7 +283,6 @@ public class TodoappApplication {
 				);
 			} else{
 				arraylist.sort(
-					//(b, a) -> a.getDueDate().compareTo(b.getDueDate())
 					Comparator.nullsLast(
 						(a, b) -> stringToLDT(a.getDueDate()+" 00:00:00").compareTo(stringToLDT(b.getDueDate()+" 00:00:00"))
 						)
@@ -321,7 +292,7 @@ public class TodoappApplication {
 		}
 
 		private ArrayList<Todo> sortByPriority(ArrayList<Todo> arraylist, String sortByPriority){
-			// - sortByPriority, low=low, high=high;
+			// - sortByPriority, low=low, high=anything else;
 			if(sortByPriority.equals("low")){
 				arraylist.sort(
 					(a, b) -> String.valueOf(a.getPriority()).compareTo(String.valueOf(b.getPriority()))
@@ -371,10 +342,7 @@ public class TodoappApplication {
 			 *  - array[0, 9]
 			 *  - Total number of todos
 			 *  - Total number of todos after filters
-			 *  - Total number of pages after filters: howManyTodos/10 -> Math.roundUp()/ceiling, etc...
 			 *  - metrics
-			 //Create a response object, todos, total numbers, metrics
-			 List<Todo> paginatedList = todos.subList(0, 9);
 			 */
 			//From allParams, filter todos arraylist
 			/* Parameters:
@@ -407,10 +375,11 @@ public class TodoappApplication {
 			} else{
 				currentPage = 1;
 			}
-			//Checar si se puede cambiar 
+			//Number of elements per page= 10
 			int howManyElements = 10;
 			int fromIndex = 0 + (howManyElements*(currentPage-1));
-			int toIndex = 10 + (howManyElements*(currentPage-1));	//if toIndex > arr.size()-1 -> toIndex = arr.size()-1  
+			int toIndex = 10 + (howManyElements*(currentPage-1));
+			//If the number of elements for the last page is less than 10, change toIndex
 			if(toIndex>filterdArray.size()){
 				toIndex = filterdArray.size();
 			}
@@ -420,7 +389,8 @@ public class TodoappApplication {
 			System.out.println("ToIndex: " + toIndex);
 
 			List<Todo> paginatedList = filterdArray.subList(fromIndex, toIndex);
-			int totalPages = (int) Math.ceil(filterdArray.size()/10.0);	//cambiar por howManyElements, castear de int a float
+			int totalPages = (int) Math.ceil(filterdArray.size()/10.0);
+			//null values kept crashing the API, handle -1 and -2 values on the frontend
 			Integer nextPage = currentPage+1 <= totalPages ? currentPage+1 : -1;
 			Integer prevPage = currentPage-1 >= 1 ? currentPage-1 : -2;
 			
@@ -428,9 +398,10 @@ public class TodoappApplication {
 			System.out.println("TotalPages: " + totalPages);
 			System.out.println("NetPage: " + nextPage);
 			System.out.println("PrevPage: " + prevPage);
-			//Manejar en front casos de -1, y -2
+			
 			Pagination pagination = new Pagination(todos.size(),filterdArray.size(),currentPage, totalPages, nextPage, prevPage);
 
+			//Get average times in a nice format -> mm:ss
 			String metricsOverallAvg = timeDiffStringFormatter(overallAverage);
 			String metricsLowAvg = timeDiffStringFormatter(lowAverage);
 			String metricsMedAvg = timeDiffStringFormatter(medAverage);
@@ -444,11 +415,10 @@ public class TodoappApplication {
 			
 		String updateTodo(int id, Todo todo){
 			System.out.println("Trying to update todo with id: " + id);
-			System.out.println("Recieved request body: ");
+			//Look for todo with id=id, gets a -1 if not found
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
 				System.out.println("Found element with id: " + id + " at index: " +elementIndex);
-				//todos.set(elementIndex, todo);
 				todos.get(elementIndex).setText(todo.text);
 				todos.get(elementIndex).setDueDate(todo.dueDate);
 				todos.get(elementIndex).setPriority(todo.priority);
@@ -464,10 +434,7 @@ public class TodoappApplication {
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
 				System.out.println("Found element with id: " + id + " at index: " +elementIndex);
-				//todos.set(elementIndex, todo);
 				todos.get(elementIndex).setDoneState(true);
-				//TODO: Set doneDate property to current date and time.
-				//LocalDateTime now = LocalDateTime.now();
 				todos.get(elementIndex).setDoneDate(ldtToString(LocalDateTime.now()));
 				timeDiffString(todos.get(elementIndex).getCreationDate(), todos.get(elementIndex).getDoneDate());
 			} else{
@@ -481,10 +448,8 @@ public class TodoappApplication {
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
 				System.out.println("Found element with id: " + id + " at index: " +elementIndex);
-				//todos.set(elementIndex, todo);
 				todos.get(elementIndex).setDoneState(false);
 				todos.get(elementIndex).setDoneDate(null);
-				//TODO: Clear doneDate.
 				todos.get(elementIndex).setDoneDate(null);
 			} else{
 				System.out.println("Couldn't find element with id: "+ id);
@@ -493,7 +458,6 @@ public class TodoappApplication {
 		} 
 
 		String deleteTodo(int id){
-			//int arrIndex = todos.removeIf(null) ;
 			todos.removeIf(e -> e.getId() == (id));
 			return "To Do con ID: " + id + " eliminado correctamente!";
 		}
@@ -561,7 +525,7 @@ public class TodoappApplication {
 			this.creationDate = creationDate;
 		}
 	}
-
+ 
 	static class Response {
 		List<Todo> data;
 		Pagination pagination;
@@ -593,9 +557,6 @@ public class TodoappApplication {
 		public void setMetrics(Metrics metrics) {
 			this.metrics = metrics;
 		}
-
-		
-		
 	}
 	
 	static class Pagination {
@@ -606,7 +567,6 @@ public class TodoappApplication {
 		Integer next_page;
 		Integer prev_page;
 
-		
 		public Pagination(int total_records, int total_filtered, int current_page, int total_pages, Integer next_page,
 				Integer prev_page) {
 			this.total_records = total_records;
@@ -657,8 +617,8 @@ public class TodoappApplication {
 		public void setPrev_page(Integer prev_page) {
 			this.prev_page = prev_page;
 		}
-		
 	}
+
 	static class Metrics {
 		String overallAverage;
 		String lowPriorirtyAverage;
@@ -708,9 +668,6 @@ public class TodoappApplication {
 		public void setHighPriorityAverage(String highPriorityAverage) {
 			this.highPriorityAverage = highPriorityAverage;
 		}
-
-		
 	}
-
 
 }
