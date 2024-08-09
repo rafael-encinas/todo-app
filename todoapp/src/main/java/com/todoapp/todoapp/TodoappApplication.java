@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,7 @@ public class TodoappApplication {
 	}
 
 	@RestController
+	@CrossOrigin
 	@RequestMapping("/api/todos")
 	static class TodoResource {
 		private final TodosInMemoryRepository repository;
@@ -39,12 +41,14 @@ public class TodoappApplication {
 			this.repository = repository;
 		}
 
+		//@CrossOrigin(origins = "http://localhost:8080")
 		@GetMapping
 		public ResponseEntity<Response> findPagination(@RequestParam Map<String,String> allParams){
 			Response response = repository.findPagination(allParams);
             return ResponseEntity.ok(response);
 		}
 
+		//@CrossOrigin(origins = "http://localhost:8080")
 		@GetMapping(value = "/getall")
 		public ResponseEntity<ArrayList<Todo>> findAll(@RequestParam Map<String,String> allParams){
 			ArrayList<Todo> todos = repository.findAll(allParams);
@@ -55,8 +59,9 @@ public class TodoappApplication {
             return ResponseEntity.ok(todos);
 		}
 		
+	//	@CrossOrigin(origins = "http://localhost:8080")
 		@PostMapping
-		public ResponseEntity<String> saveTodo(@RequestBody Todo todo){
+		public ResponseEntity<Todo> saveTodo(@RequestBody Todo todo){
 			int maxTextLength = 120;
 			int minTextLength = 1;
 			boolean textLengthCheck = false;
@@ -69,11 +74,13 @@ public class TodoappApplication {
 				prioritySetCheck = true;
 			}
 
-			if(textLengthCheck && prioritySetCheck) return ResponseEntity.ok(repository.saveTodo(todo));
+			//if(textLengthCheck && prioritySetCheck) 
+			return ResponseEntity.ok(repository.saveTodo(todo));
 
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("There was a problem with the request, please confirm that 'text' has at least 1 character, and at most 120 characters, and that a priority has been set.");
+			//return ResponseEntity.status(HttpStatus.FORBIDDEN).body("There was a problem with the request, please confirm that 'text' has at least 1 character, and at most 120 characters, and that a priority has been set.");
 		}
 
+	//	@CrossOrigin(origins = "http://localhost:8080")
 		@PutMapping("/{id}")
 		public ResponseEntity<String> updateTodo(@PathVariable int id, @RequestBody Todo todo) {
 			int maxTextLength = 120;
@@ -92,17 +99,20 @@ public class TodoappApplication {
 		}
 
 		//Post /todos/{id}/done to mark "todo" as done
+	//	@CrossOrigin(origins = "http://localhost:8080")
 		@PostMapping("/{id}/done")
 		public ResponseEntity<Todo> markDone(@PathVariable int id) {
 			return ResponseEntity.ok(repository.markDone(id));
 		}
 		
 		//Put /todos/{id}/undone to mark "todo" as undone
+	//	@CrossOrigin(origins = "http://localhost:8080")
 		@PutMapping("/{id}/undone")
 		public ResponseEntity<Todo> markUndone(@PathVariable int id) {
 			return ResponseEntity.ok(repository.markUndone(id));
 		}
 
+	//	@CrossOrigin(origins = "http://localhost:8080")
 		@DeleteMapping(value = "/{id}")
 		public ResponseEntity<String> deleteTodo(@PathVariable("id") int id){
 			return ResponseEntity.ok(repository.deleteTodo(id));
@@ -230,12 +240,12 @@ public class TodoappApplication {
 			return displayMinutes + ":" + displaySeconds;
 		}
 
-		String saveTodo(Todo todo){
+		Todo saveTodo(Todo todo){
 			todo.setId(lastId+1);
 			todo.setCreationDate(ldtToString(LocalDateTime.now()));
 			todos.add(todo);
 			lastId = lastId+1;
-			return "Todo created succesfully";
+			return todo; //"Todo created succesfully";
 		}
 
 		ArrayList<Todo> findAll(Map<String,String> allParams){
