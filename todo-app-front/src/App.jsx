@@ -3,7 +3,17 @@ import { useState } from 'react'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { Counter } from './features/counter/Counter';
+import { SearchText } from './features/searchText/SearcText';
+import { SearchBar } from './features/components/SearchBar';
+import { ToDosTable } from './features/components/ToDosTable';
+import { NewToDoBtn } from './features/components/NewToDoBtn';
+import { NewTodoModal } from './features/components/NewTodoModal';
+import { Metrics } from './features/components/Metrics';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { updateFilters } from './features/todos/todos';
 
+/*
 function SearchBar(){
 
   return(
@@ -33,13 +43,15 @@ function SearchBar(){
     </form>
   );
 }
-
+*/
+/*
 function NewToDoBtn({ toggleModal }){
   return(
     <button className='newToDoBtn generalBtn' onClick={toggleModal}>+ New To Do</button>
   );
 }
-
+*/
+/*
 function ToDosTable({ todosArr }){
   const rows = [];
   todosArr.forEach((todo)=>{
@@ -50,16 +62,6 @@ function ToDosTable({ todosArr }){
       />
     )
   });
-  //console.log(rows);
-  /*
-
-        <ToDoRow toDo={todosArr[0]} />
-        <ToDoRow toDo={todosArr[1]} />
-        <ToDoRow toDo={todosArr[2]} />
-        <ToDoRow toDo={todosArr[3]} />
-
-  */
-
 
   return(
     <div className='tableContainer'>
@@ -85,14 +87,29 @@ function ToDoRow({ toDo }){
   let checked = toDo.doneState?"checked":null;
   return(
     <tr>          
-      <td className='colState'><input type="checkbox" name="" id="" checked={toDo.doneState} /></td> 
+      <td className='colState'>
+        <input type="checkbox" name="" id={toDo.id} checked={toDo.doneState}
+          onChange={()=>{console.log("State changed for todo with id: " + toDo.id)}}
+        /></td> 
       <td>{toDo.text}</td>  
       <td>{toDo.priority}</td> 
       <td>{toDo.dueDate}</td> 
-      <td><button className='generalBtn'>Edit</button><button className='generalBtn'>Delete</button></td> 
+      <td>
+        <button className='generalBtn'
+          onClick={()=>{console.log("Clicked on 'Edit' for todo with id: " + toDo.id)}}
+          >
+            Edit
+        </button>
+        <button className='generalBtn'
+          onClick={()=>{console.log("Clicked on 'Delete' for todo with id: " + toDo.id)}}
+          >
+            Delete
+        </button>
+      </td> 
     </tr>
   );
 }
+*/
 
 function PaginationControl(){
   let pages= [1,2,3,4,5,6,7,8,9,10];
@@ -118,7 +135,9 @@ function PageButton({ pageNum }){
   );
 }
 
-function Metrics(){
+/*
+function Metrics({ metrics }){
+  const searchText = useSelector((state)=> state.searchText.testing)
   return(
     <div className='metricsContainer'>
       <div>
@@ -127,9 +146,9 @@ function Metrics(){
       </div>
       <div>
         <div>Average time to finish tasks by priority:</div>
-        <div>Low: 10:25 minutes</div>
-        <div>Medium: 10:25 minutes</div>
-        <div>High: 10:25 minutes</div>
+        <div>Low: <span>{searchText}</span></div>
+        <div>Medium: <span>10:25 minutes</span></div>
+        <div>High: <span>10:25 minutes</span></div>
       </div>
     </div>
   )
@@ -157,26 +176,16 @@ function NewTodoModal({ toggleModal }){
       </div>
       <div className='btnsContainer'>
         <button className='generalBtn' onClick={toggleModal}>Cancel</button>
-        <button className='generalBtn saveTodoBtn'>Save</button>
+        <button type='submit' className='generalBtn saveTodoBtn'>Save</button>
       </div>
     </div>
   );
 }
+*/
 
 function App() {
   const [modalState, setModalState] = useState(false);
-  let todosArr = [
-    {id: 0, text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et efficitur risus. Nulla varius vehicula massa, sus.", dueDate: "2024/08/12", doneState: false, doneDate: "-", priority: "High", creationDate: "2024/07/29"},
-    {id: 1, text: "Task 1", dueDate: "-", doneState: true, doneDate: "2022/02/01", priority: "Low", creationDate: "2022/01/15"},
-    {id: 2, text: "Task 2", dueDate: "2022/02/02", doneState: false, doneDate: "-", priority: "High", creationDate: "2022/01/18"},
-    {id: 3, text: "Task 3", dueDate: "2023/02/02", doneState: false, doneDate: "-", priority: "Medium", creationDate: "2022/01/04"},
-    {id: 4, text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et efficitur risus. Nulla varius vehicula massa, sus.", dueDate: "2024/08/12", doneState: false, doneDate: "-", priority: "High", creationDate: "2024/07/29"},
-    {id: 5, text: "Task 5", dueDate: "-", doneState: true, doneDate: "2022/02/01", priority: "Low", creationDate: "2022/01/15"},
-    {id: 6, text: "Task 6", dueDate: "2022/02/02", doneState: false, doneDate: "-", priority: "High", creationDate: "2022/01/18"},
-    {id: 7, text: "Task 7", dueDate: "2023/02/02", doneState: true, doneDate: "-", priority: "Medium", creationDate: "2022/01/04"},
-    {id: 8, text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et efficitur risus. Nulla varius vehicula massa, sus.", dueDate: "2024/08/12", doneState: false, doneDate: "-", priority: "High", creationDate: "2024/07/29"},
-    {id: 9, text: "Task 9", dueDate: "-", doneState: true, doneDate: "2022/02/01", priority: "Low", creationDate: "2022/01/15"},
-  ]
+  const todosArr = useSelector((state)=> state.todos.data);
 
   function toggleModal(){
     setModalState(!modalState);
@@ -189,6 +198,7 @@ function App() {
       <ToDosTable todosArr={todosArr} />
       <PaginationControl />
       <Counter />
+      <SearchText />
       <Metrics />
       {modalState? <NewTodoModal toggleModal={toggleModal}/> :null}
     </>
