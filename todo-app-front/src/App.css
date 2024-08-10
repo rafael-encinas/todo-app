@@ -7,7 +7,7 @@
 #root {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   text-align: center;
   display: flex;
   flex-grow: 1;
@@ -99,6 +99,11 @@ td{
   border: 1px solid var(--white-color);
 }
 
+.paginationText{
+  margin-top: 5px;
+  font-size: smaller;
+}
+
 .metricsContainer{
   box-sizing: border-box;
   border: 1px solid var(--white-color);
@@ -148,4 +153,15 @@ td{
       background-color: #1b69dc;
     }
   }
+}
+
+.currentPage{
+    transition: 50ms;
+    background-color: #1b69dc;
+    &:hover{
+      background-color: #3e86f1;
+    }
+    &:active{
+      background-color: #1b69dc;
+    }
 }

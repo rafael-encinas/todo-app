@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-export function ToDoRow({ toDo }){
+export function ToDoRow({ getNewData, toDo }){
     let checked = toDo.doneState?"checked":null;
     return(
       <tr>          

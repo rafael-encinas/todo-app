@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-export function NewTodoModal({ toggleModal }){
+export function NewTodoModal({ getNewData, toggleModal }){
   //Convertir de div a form, utilizar los datos del form para validacion
 
   function handleSubmit(event){
@@ -31,6 +31,9 @@ export function NewTodoModal({ toggleModal }){
     //if duedate is an empty string, set to null
     if(textLengthCheck && priorityCheck){
       postRequest(textInput,  dueDateInput, priorityInput,);
+
+      //Get request here!
+      //getNewData();
     }
   }
 

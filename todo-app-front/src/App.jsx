@@ -8,10 +8,76 @@ import { SearchBar } from './features/components/SearchBar';
 import { ToDosTable } from './features/components/ToDosTable';
 import { NewToDoBtn } from './features/components/NewToDoBtn';
 import { NewTodoModal } from './features/components/NewTodoModal';
+import { PaginationControl } from './features/components/PaginationControl';
 import { Metrics } from './features/components/Metrics';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
-import { updateFilters } from './features/todos/todos';
+import { updateData, updateMetrics } from './features/todos/todos';
+import { updatePagination } from './features/pagination/paginationSlice';
+import { useTodo } from './features/hooks/useTodo.JS';
+
+function App() {
+  const [modalState, setModalState] = useState(false);
+  const todosArr = useSelector((state)=> state.todos.data);
+  const filters = useSelector((state)=> state.todos.filters);
+  const sort = useSelector((state)=> state.todos.sort);
+  const page = useSelector((state)=> state.pagination.requestPage.page);
+  const dispatch = useDispatch();
+
+
+  function toggleModal(){
+    setModalState(!modalState);
+  }
+
+  function getNewData(){
+    console.log("Time to get data!");
+    //Create get request
+
+    console.log("Sort: ");
+    console.log(sort);
+
+    let requestString = `page=${page}&priority=${filters.priority}&state=${filters.state}&text=${filters.text}`;
+    if(sort.sortByPrioirty != null){
+      requestString += `&sortByPriority=${sort.sortByPrioirty}`;
+    }
+
+    if(sort.sortByDate != null){
+      requestString += `&sortByDate=${sort.sortByDate}`;
+    }
+    
+    console.log("requestString: " + requestString);
+    
+    //console.log("sortByPriority: " + sort.sortByPrioirty);
+    const requestOptions = {
+      method: 'GET',
+      headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+    }
+    
+    fetch(`http://localhost:9090/api/todos?${requestString}`, requestOptions)
+      .then(response=>response.json())
+      .then(data=> {
+        console.log(data);
+        dispatch(updateData(data.data));
+        dispatch(updateMetrics(data.metrics));
+        dispatch(updatePagination(data.pagination));
+      })
+  }
+
+  return (
+    <>
+      <SearchBar getNewData={getNewData} />
+      <NewToDoBtn   toggleModal={toggleModal}  />
+      <ToDosTable getNewData={getNewData}  todosArr={todosArr} />
+      <PaginationControl getNewData={getNewData}  />
+      <SearchText />
+      <Metrics />
+      {modalState? <NewTodoModal getNewData={getNewData} toggleModal={toggleModal}/> :null}
+    </>
+  )
+}
+
+export default App
+
 
 /*
 function SearchBar(){
@@ -43,15 +109,12 @@ function SearchBar(){
     </form>
   );
 }
-*/
-/*
+
 function NewToDoBtn({ toggleModal }){
   return(
     <button className='newToDoBtn generalBtn' onClick={toggleModal}>+ New To Do</button>
   );
 }
-*/
-/*
 function ToDosTable({ todosArr }){
   const rows = [];
   todosArr.forEach((todo)=>{
@@ -109,7 +172,6 @@ function ToDoRow({ toDo }){
     </tr>
   );
 }
-*/
 
 function PaginationControl(){
   let pages= [1,2,3,4,5,6,7,8,9,10];
@@ -135,7 +197,6 @@ function PageButton({ pageNum }){
   );
 }
 
-/*
 function Metrics({ metrics }){
   const searchText = useSelector((state)=> state.searchText.testing)
   return(
@@ -182,27 +243,3 @@ function NewTodoModal({ toggleModal }){
   );
 }
 */
-
-function App() {
-  const [modalState, setModalState] = useState(false);
-  const todosArr = useSelector((state)=> state.todos.data);
-
-  function toggleModal(){
-    setModalState(!modalState);
-  }
-
-  return (
-    <>
-      <SearchBar />
-      <NewToDoBtn toggleModal={toggleModal}  />
-      <ToDosTable todosArr={todosArr} />
-      <PaginationControl />
-      <Counter />
-      <SearchText />
-      <Metrics />
-      {modalState? <NewTodoModal toggleModal={toggleModal}/> :null}
-    </>
-  )
-}
-
-export default App
