@@ -41,7 +41,7 @@ public class TodoappApplication {
 			this.repository = repository;
 		}
 
-		//@CrossOrigin(origins = "http://localhost:8080")
+		@CrossOrigin(origins = "http://localhost:8080")
 		@GetMapping
 		public ResponseEntity<Response> findPagination(@RequestParam Map<String,String> allParams){
 			Response response = repository.findPagination(allParams);
@@ -64,39 +64,52 @@ public class TodoappApplication {
 		public ResponseEntity<Todo> saveTodo(@RequestBody Todo todo){
 			int maxTextLength = 120;
 			int minTextLength = 1;
+			Todo todoPostError = new Todo();
 			boolean textLengthCheck = false;
 			if(todo.getText().length() <= maxTextLength && todo.getText().length() >= minTextLength) {
 				textLengthCheck = true;
+			} else{
+				todoPostError.setText("Error: Text must have between 1 and 120 characters. Try again");
+				todoPostError.setId(-1);
+				return ResponseEntity.ok(todoPostError);
 			}
 			
 			boolean prioritySetCheck = false;
 			if(todo.getPriority() <= 2 && todo.getPriority() >= 0) {
 				prioritySetCheck = true;
+			} else{
+				todoPostError.setText("Error: Priority must between 0 and 2. Try again");
+				todoPostError.setId(-1);
+				return ResponseEntity.ok(todoPostError);
 			}
-
-			//if(textLengthCheck && prioritySetCheck) 
 			return ResponseEntity.ok(repository.saveTodo(todo));
 
-			//return ResponseEntity.status(HttpStatus.FORBIDDEN).body("There was a problem with the request, please confirm that 'text' has at least 1 character, and at most 120 characters, and that a priority has been set.");
 		}
 
 	//	@CrossOrigin(origins = "http://localhost:8080")
 		@PutMapping("/{id}")
-		public ResponseEntity<String> updateTodo(@PathVariable int id, @RequestBody Todo todo) {
+		public ResponseEntity<Todo> updateTodo(@PathVariable int id, @RequestBody Todo todo) {
 			int maxTextLength = 120;
 			int minTextLength = 1;
+			Todo todoPostError = new Todo();
 			boolean textLengthCheck = false;
 			if(todo.getText().length() <= maxTextLength && todo.getText().length() >= minTextLength) {
 				textLengthCheck = true;
+			} else{
+				todoPostError.setText("Error: Text must have between 1 and 120 characters. Try again");
+				todoPostError.setId(-1);
+				return ResponseEntity.ok(todoPostError);
 			}
 			boolean prioritySetCheck = false;
 			if(todo.getPriority() <= 2 && todo.getPriority() >= 0) {
 				prioritySetCheck = true;
+			} else{
+				todoPostError.setText("Error: Priority must between 0 and 2. Try again");
+				todoPostError.setId(-1);
+				return ResponseEntity.ok(todoPostError);
 			}
-			if(textLengthCheck && prioritySetCheck) return ResponseEntity.ok(repository.updateTodo(id, todo));
-			
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("There was a problem with the request, please confirm that 'text' has at least 1 character, and at most 120 characters, and that a priority has been set.");
-		}
+			return ResponseEntity.ok(repository.updateTodo(id, todo));
+			}
 
 		//Post /todos/{id}/done to mark "todo" as done
 	//	@CrossOrigin(origins = "http://localhost:8080")
@@ -114,7 +127,7 @@ public class TodoappApplication {
 
 	//	@CrossOrigin(origins = "http://localhost:8080")
 		@DeleteMapping(value = "/{id}")
-		public ResponseEntity<String> deleteTodo(@PathVariable("id") int id){
+		public ResponseEntity<Todo> deleteTodo(@PathVariable("id") int id){
 			return ResponseEntity.ok(repository.deleteTodo(id));
 		}
 	}
@@ -291,10 +304,10 @@ public class TodoappApplication {
 					(a, b) -> stringToLDT(a.getDueDate()+" 00:00:00").compareTo(stringToLDT(b.getDueDate()+" 00:00:00"))
 					)
 				);
-			} else{
+			} else if(sortByDate.equals("later")){
 				arraylist.sort(
 					Comparator.nullsLast(
-						(a, b) -> stringToLDT(a.getDueDate()+" 00:00:00").compareTo(stringToLDT(b.getDueDate()+" 00:00:00"))
+						(b, a) -> stringToLDT(a.getDueDate()+" 00:00:00").compareTo(stringToLDT(b.getDueDate()+" 00:00:00"))
 						)
 				);
 			}
@@ -423,7 +436,7 @@ public class TodoappApplication {
 			 return response;
 			}
 			
-		String updateTodo(int id, Todo todo){
+		Todo updateTodo(int id, Todo todo){
 			System.out.println("Trying to update todo with id: " + id);
 			//Look for todo with id=id, gets a -1 if not found
 			int elementIndex = getIndexFromId(id);
@@ -434,9 +447,9 @@ public class TodoappApplication {
 				todos.get(elementIndex).setPriority(todo.priority);
 			} else{
 				System.out.println("Couldn't find element with id: "+ id);
-				return "Error: could not find To Do with id: '" +id +"'.";
+				//return "Error: could not find To Do with id: '" +id +"'.";
 			}
-			return "To do updated successfully";
+			return todos.get(elementIndex);
 		}
 
 		Todo markDone(int id){
@@ -448,7 +461,10 @@ public class TodoappApplication {
 				todos.get(elementIndex).setDoneDate(ldtToString(LocalDateTime.now()));
 				timeDiffString(todos.get(elementIndex).getCreationDate(), todos.get(elementIndex).getDoneDate());
 			} else{
-				System.out.println("Couldn't find element with id: "+ id);
+				Todo todoError = new Todo();
+				todoError.setText("Error: couldn't find To Do with id: " + id + ", please try a different id.");
+				todoError.setId(-1);
+				return todoError;
 			}
 			return todos.get(elementIndex);
 		} 
@@ -463,13 +479,28 @@ public class TodoappApplication {
 				todos.get(elementIndex).setDoneDate(null);
 			} else{
 				System.out.println("Couldn't find element with id: "+ id);
+				Todo todoError = new Todo();
+				todoError.setText("Error: couldn't find To Do with id: " + id + ", please try a different id.");
+				todoError.setId(-1);
+				return todoError;
 			}
 			return todos.get(elementIndex);
 		} 
 
-		String deleteTodo(int id){
-			todos.removeIf(e -> e.getId() == (id));
-			return "To Do con ID: " + id + " eliminado correctamente!";
+		Todo deleteTodo(int id){
+			int elementIndex = getIndexFromId(id);
+			Todo todoToDelete = new Todo();
+			if(elementIndex>-1){
+				todoToDelete = todos.get(elementIndex);
+				todos.removeIf(e -> e.getId() == (id));
+			} else{
+				//todoToDelete.setText("Todo not found");
+				Todo todoError = new Todo();
+				todoError.setText("Error: couldn't find To Do with id: " + id + ", please try a different id.");
+				todoError.setId(-1);
+				return todoError;
+			}
+			return todoToDelete;
 		}
 	}
 
@@ -490,6 +521,10 @@ public class TodoappApplication {
 			this.doneDate = doneDate;
 			this.priority = priority;
 			this.creationDate = creationDate;
+		}
+
+		public Todo(){
+
 		}
 
 		public int getId() {
@@ -631,15 +666,15 @@ public class TodoappApplication {
 
 	static class Metrics {
 		String overallAverage;
-		String lowPriorirtyAverage;
-		String medPriorirtyAverage;
+		String lowPriorityAverage;
+		String medPriorityAverage;
 		String highPriorityAverage;
 
-		public Metrics(String overallAverage, String lowPriorirtyAverage, String medPriorirtyAverage,
+		public Metrics(String overallAverage, String lowPriorityAverage, String medPriorityAverage,
 				String highPriorityAverage) {
 			this.overallAverage = overallAverage;
-			this.lowPriorirtyAverage = lowPriorirtyAverage;
-			this.medPriorirtyAverage = medPriorirtyAverage;
+			this.lowPriorityAverage = lowPriorityAverage;
+			this.medPriorityAverage = medPriorityAverage;
 			this.highPriorityAverage = highPriorityAverage;
 		}
 
@@ -655,20 +690,20 @@ public class TodoappApplication {
 			this.overallAverage = overallAverage;
 		}
 
-		public String getLowPriorirtyAverage() {
-			return lowPriorirtyAverage;
+		public String getLowPriorityAverage() {
+			return lowPriorityAverage;
 		}
 
-		public void setLowPriorirtyAverage(String lowPriorirtyAverage) {
-			this.lowPriorirtyAverage = lowPriorirtyAverage;
+		public void setLowPriorityAverage(String lowPriorityAverage) {
+			this.lowPriorityAverage = lowPriorityAverage;
 		}
 
-		public String getMedPriorirtyAverage() {
-			return medPriorirtyAverage;
+		public String getMedPriorityAverage() {
+			return medPriorityAverage;
 		}
 
-		public void setMedPriorirtyAverage(String medPriorirtyAverage) {
-			this.medPriorirtyAverage = medPriorirtyAverage;
+		public void setMedPriorityAverage(String medPriorityAverage) {
+			this.medPriorityAverage = medPriorityAverage;
 		}
 
 		public String getHighPriorityAverage() {
