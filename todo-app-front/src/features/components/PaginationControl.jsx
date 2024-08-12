@@ -7,6 +7,9 @@ import { updateRequestPage } from "../pagination/paginationSlice";
 export function PaginationControl({onGetFilteredData}){
     const dispatch = useDispatch();
     const pagination = useSelector((state)=> state.pagination.pagination)
+    const filters = useSelector((state)=> state.todos.filters);
+    const sort = useSelector((state)=> state.todos.sort);
+    const page = useSelector((state)=> state.pagination.requestPage.page);
     //const [page, setPage] = useState(1);
     //console.log(pagination);
     //for(pagination.total_pages) to create all the pages buttons
@@ -23,6 +26,7 @@ export function PaginationControl({onGetFilteredData}){
             dispatch(updateRequestPage(pagination.prev_page));
             //Get request here!
             //getNewData();
+            onGetFilteredData(filters, sort, pagination.prev_page);
         } else{
             console.log("No previews page found!");
         }
@@ -34,6 +38,7 @@ export function PaginationControl({onGetFilteredData}){
             dispatch(updateRequestPage(pagination.next_page));
             //Get request here!
             //getNewData();
+            onGetFilteredData(filters, sort, pagination.next_page);
         } else{
             console.log("No next page found!");
         }

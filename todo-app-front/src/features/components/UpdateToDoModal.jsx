@@ -11,8 +11,8 @@ export function UpdateToDoModal({ toggleUpdateModal, toDo, onUpdateTodo }){
 
   const filters = useSelector((state)=> state.todos.filters);
   const sort = useSelector((state)=> state.todos.sort);
-  //const page = useSelector((state)=> state.pagination.requestPage.page);
-  let page = 1;
+  const page = useSelector((state)=> state.pagination.requestPage.page);
+  
 
   console.log("DueDate for todo with id: "+ toDo.id + " -> " + dueDate);
 

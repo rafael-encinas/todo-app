@@ -10,9 +10,21 @@ export function ToDoRow({ onGetFilteredData, onDeleteTodo, toDo, onUpdateTodo, o
     const [todoState, setTodoState] = useState(toDo.doneState)
     const filters = useSelector((state)=> state.todos.filters);
     const sort = useSelector((state)=> state.todos.sort);
+    const [priorityText, setPriorityText] = useState("Low");
       //const page = useSelector((state)=> state.pagination.requestPage.page);
     const page = 1;
     let checked = toDo.doneState?"checked":null;
+    
+    /*
+    if(toDo.priority == 1){
+      setPriorityText("Medium");
+      }
+    else if(toDo.priority == 2){
+      setPriorityText("High");
+    } else {
+      setPriorityText("Low");
+    }
+    */
 
     function toggleUpdateModal(){
       setUpdateTodoModalState(!updateTodoModalState);
@@ -47,8 +59,8 @@ export function ToDoRow({ onGetFilteredData, onDeleteTodo, toDo, onUpdateTodo, o
            }}
           /></td> 
         <td>{toDo.text}</td>  
-        <td>{toDo.priority}</td> 
-        <td>{toDo.dueDate}</td> 
+        <td>{toDo.priority==0?"Low":toDo.priority==1?"Medium":"High"}</td> 
+        <td>{toDo.dueDate!=null?toDo.dueDate:"-"}</td> 
         <td>
           <button className='generalBtn'
             onClick={updateTodo}

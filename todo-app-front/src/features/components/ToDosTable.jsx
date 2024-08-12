@@ -7,6 +7,7 @@ export function ToDosTable({ onGetFilteredData, onDeleteTodo, todosArr, onUpdate
   const dispatch = useDispatch();
   //const sort = useSelector((state)=> state.todos.sort);
   const filters = useSelector((state) => state.todos.filters);
+  const page = useSelector((state)=> state.pagination.requestPage.page);
   const [priority, setPriority] = useState(null);
   const [dueDate, setDueDate] = useState(null);
   const [dueDateTest, setDueDateTest] = useState("change due date test!");
@@ -46,7 +47,6 @@ export function ToDosTable({ onGetFilteredData, onDeleteTodo, todosArr, onUpdate
           sortByPriority: null,
           sortByDate: dueDate,
         }
-        let page = 1;
         onGetFilteredData(filters, sort, page);
       }
       else if(priority == null){
@@ -59,7 +59,6 @@ export function ToDosTable({ onGetFilteredData, onDeleteTodo, todosArr, onUpdate
           sortByPriority: "low",
           sortByDate: dueDate,
         }
-        let page = 1;
         onGetFilteredData(filters, sort, page);
       } else{
         console.log("Sort high to low!");
@@ -71,7 +70,6 @@ export function ToDosTable({ onGetFilteredData, onDeleteTodo, todosArr, onUpdate
           sortByPriority: "high",
           sortByDate: dueDate,
         }
-        let page = 1;
         onGetFilteredData(filters, sort, page);
       }
     }
@@ -90,7 +88,6 @@ export function ToDosTable({ onGetFilteredData, onDeleteTodo, todosArr, onUpdate
           sortByPriority: priority,
           sortByDate: null,
         }
-        let page = 1;
         onGetFilteredData(filters, sort, page);
       }
       else if(dueDate == null){
@@ -102,7 +99,6 @@ export function ToDosTable({ onGetFilteredData, onDeleteTodo, todosArr, onUpdate
           sortByPriority: priority,
           sortByDate: "sooner",
         }
-        let page = 1;
         onGetFilteredData(filters, sort, page);
       } else{
         setDueDate("later");
@@ -113,7 +109,6 @@ export function ToDosTable({ onGetFilteredData, onDeleteTodo, todosArr, onUpdate
           sortByPriority: priority,
           sortByDate: "later",
         }
-        let page = 1;
         onGetFilteredData(filters, sort, page);
       }
       //Hacer GET para obtener todos sorteados
@@ -122,8 +117,7 @@ export function ToDosTable({ onGetFilteredData, onDeleteTodo, todosArr, onUpdate
       let sort= {
         sortByPriority: priority,
         sortByDate: dueDate,
-      }
-      let page = 1;
+      
       onGetFilteredData(filters, sort, page);
 
       */

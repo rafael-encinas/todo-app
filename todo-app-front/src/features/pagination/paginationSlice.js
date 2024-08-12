@@ -20,7 +20,7 @@ export const paginationSlice = createSlice({
             state.pagination = action.payload
         },
         updateRequestPage: (state, action)=>{
-            state.requestPage = action.payload
+            state.requestPage.page = action.payload
         }
     }
 });

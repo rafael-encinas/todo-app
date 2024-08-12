@@ -7,7 +7,7 @@ export function useTodo(){
     const filters = useSelector((state)=> state.todos.filters);
     const sort = useSelector((state)=> state.todos.sort);
     const page = useSelector((state)=> state.pagination.requestPage.page);
-    const sortDateTest = useSelector((state) => state.todos.sortDateTest);
+    //const sortDateTest = useSelector((state) => state.todos.sortDateTest);
     const dispatch = useDispatch();
 
     //Only runs one time for initial rendering, gets all todos with no filters
@@ -27,17 +27,21 @@ export function useTodo(){
         })
     }, [0]);
 
-    const onGetFilteredData = (filters, sort, page)=>{
+    const onGetFilteredData = (filters, sort, requestPage)=>{
         //Filters, sort, and page should come from invocation
 
         console.log("**************************")
         console.log("From inside useTodo:")
         console.log(filters);
         console.log(sort);
-        console.log(page);
+        console.log("Page: " + requestPage);
+
+        if(requestPage === undefined){
+          requestPage = 1;
+        }
 
 
-        let requestString = `page=${page}&priority=${filters.priority}&state=${filters.state}&text=${filters.text}`;
+        let requestString = `page=${requestPage}&priority=${filters.priority}&state=${filters.state}&text=${filters.text}`;
         if(sort.sortByPriority != null){
         requestString += `&sortByPriority=${sort.sortByPriority}`;
         }
@@ -74,7 +78,7 @@ export function useTodo(){
               .then(data => console.log(data));
 
               setTimeout(
-                () => onGetFilteredData(filters, sort, 1), 
+                () => onGetFilteredData(filters, sort, page), 
                 100
               );
     })
@@ -91,7 +95,7 @@ export function useTodo(){
             .then(data => {
               console.log(data)
               setTimeout(
-                () => onGetFilteredData(filters, sort, 1), 
+                () => onGetFilteredData(filters, sort, page), 
                 100
               );
             });
@@ -111,7 +115,7 @@ export function useTodo(){
             .then(data => {
               console.log(data)
               setTimeout(
-                () => onGetFilteredData(filters, sort, 1), 
+                () => onGetFilteredData(filters, sort, page), 
                 100
               );
             });
@@ -131,7 +135,7 @@ export function useTodo(){
             .then(data => {
               console.log(data)
               setTimeout(
-                () => onGetFilteredData(filters, sort, 1), 
+                () => onGetFilteredData(filters, sort, page), 
                 100
               );
             });
@@ -149,9 +153,9 @@ export function useTodo(){
           .then(response => response.json())
           .then(data => console.log(data));
 
-          //setTimeout( onGetFilteredData(filters, sort, 1), 5000);
+          //setTimeout( onGetFilteredData(filters, sort, page), 5000);
           setTimeout(
-            () => onGetFilteredData(filters, sort, 1), 
+            () => onGetFilteredData(filters, sort, page), 
             100
           );
     })
