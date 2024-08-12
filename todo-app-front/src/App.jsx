@@ -8,6 +8,7 @@ import { SearchBar } from './features/components/SearchBar';
 import { ToDosTable } from './features/components/ToDosTable';
 import { NewToDoBtn } from './features/components/NewToDoBtn';
 import { NewTodoModal } from './features/components/NewTodoModal';
+import { UpdateToDoModal } from './features/components/UpdateToDoModal';
 import { PaginationControl } from './features/components/PaginationControl';
 import { Metrics } from './features/components/Metrics';
 import { useSelector } from 'react-redux';
@@ -18,16 +19,21 @@ import { useTodo } from './features/hooks/useTodo.JS';
 
 function App() {
   const [modalState, setModalState] = useState(false);
+  
   const todosArr = useSelector((state)=> state.todos.data);
   const filters = useSelector((state)=> state.todos.filters);
   const sort = useSelector((state)=> state.todos.sort);
   const page = useSelector((state)=> state.pagination.requestPage.page);
   const dispatch = useDispatch();
 
+  const { onGetFilteredData, onAddTodo, onDeleteTodo, onUpdateTodo, onUnmarkTodo, onMarkTodo } = useTodo();
+
 
   function toggleModal(){
     setModalState(!modalState);
   }
+
+
 
   function getNewData(){
     console.log("Time to get data!");
@@ -65,13 +71,13 @@ function App() {
 
   return (
     <>
-      <SearchBar getNewData={getNewData} />
+      <SearchBar onGetFilteredData={onGetFilteredData} />
       <NewToDoBtn   toggleModal={toggleModal}  />
-      <ToDosTable getNewData={getNewData}  todosArr={todosArr} />
-      <PaginationControl getNewData={getNewData}  />
+      <ToDosTable onGetFilteredData={onGetFilteredData}  todosArr={todosArr} onDeleteTodo={onDeleteTodo} onUpdateTodo={onUpdateTodo} onMarkTodo={onMarkTodo} onUnmarkTodo={onUnmarkTodo} />
+      <PaginationControl onGetFilteredData={onGetFilteredData}  />
       <SearchText />
       <Metrics />
-      {modalState? <NewTodoModal getNewData={getNewData} toggleModal={toggleModal}/> :null}
+      {modalState? <NewTodoModal getNewData={getNewData} onAddTodo={onAddTodo} toggleModal={toggleModal}/> :null}
     </>
   )
 }

@@ -57,9 +57,11 @@
 
 .tableContainer{
   overflow-x: auto;
+  width: 100%;
   & > table{
     border: 1px solid var(--white-color);
     border-collapse: collapse;
+    width: 100%;
   }
 }
 
@@ -76,6 +78,7 @@ td{
 
 .colName{
   width: fit-content;
+
 }
 
 .colPriority{

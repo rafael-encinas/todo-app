@@ -1,17 +1,25 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { updateData, updateMetrics } from "../todos/todos";
+import { updatePagination } from "../pagination/paginationSlice";
 
 export function useTodo(){
     const filters = useSelector((state)=> state.todos.filters);
     const sort = useSelector((state)=> state.todos.sort);
     const page = useSelector((state)=> state.pagination.requestPage.page);
+    const sortDateTest = useSelector((state) => state.todos.sortDateTest);
     const dispatch = useDispatch();
 
     //Only runs one time for initial rendering, gets all todos with no filters
     useEffect(()=>{
+        const requestOptions = {
+            method: 'GET',
+            headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+          } 
         fetch(`http://localhost:9090/api/todos`, requestOptions)
         .then(response=>response.json())
         .then(data=> {
+            console.log("Got data from the useEffect!");
           console.log(data);
           dispatch(updateData(data.data));
           dispatch(updateMetrics(data.metrics));
@@ -22,14 +30,23 @@ export function useTodo(){
     const onGetFilteredData = (filters, sort, page)=>{
         //Filters, sort, and page should come from invocation
 
+        console.log("**************************")
+        console.log("From inside useTodo:")
+        console.log(filters);
+        console.log(sort);
+        console.log(page);
+
+
         let requestString = `page=${page}&priority=${filters.priority}&state=${filters.state}&text=${filters.text}`;
-        if(sort.sortByPrioirty != null){
-        requestString += `&sortByPriority=${sort.sortByPrioirty}`;
+        if(sort.sortByPriority != null){
+        requestString += `&sortByPriority=${sort.sortByPriority}`;
         }
 
         if(sort.sortByDate != null){
         requestString += `&sortByDate=${sort.sortByDate}`;
         }
+
+        console.log("RequestString: " + requestString);
 
         const requestOptions = {
             method: 'GET',
@@ -55,9 +72,91 @@ export function useTodo(){
           fetch('http://localhost:9090/api/todos', requestOptions)
               .then(response => response.json())
               .then(data => console.log(data));
+
+              setTimeout(
+                () => onGetFilteredData(filters, sort, 1), 
+                100
+              );
     })
 
-    return { onGetFilteredData, onAddTodo }
+    const onUpdateTodo = ((text, dueDate, priority, id) =>{
+      console.log("dueDate from hook: " + dueDate)
+      const requestOptions = {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+          body: JSON.stringify({text: text, dueDate: dueDate, priority: priority})
+        };
+        fetch(`http://localhost:9090/api/todos/${id}`, requestOptions)
+            .then(response => response.json())
+            .then(data => {
+              console.log(data)
+              setTimeout(
+                () => onGetFilteredData(filters, sort, 1), 
+                100
+              );
+            });
+           
+    })
+
+    const onMarkTodo = ((id) =>{
+
+      console.log("Setting todo as DONE from inside hook!")
+      const requestOptions = {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+          body: JSON.stringify({})
+        };
+        fetch(`http://localhost:9090/api/todos/${id}/done`, requestOptions)
+            .then(response => response.json())
+            .then(data => {
+              console.log(data)
+              setTimeout(
+                () => onGetFilteredData(filters, sort, 1), 
+                100
+              );
+            });
+           
+    })
+
+    const onUnmarkTodo = ((id) =>{
+
+      console.log("Setting todo as undone from inside hook!")
+      const requestOptions = {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+          body: JSON.stringify({})
+        };
+        fetch(`http://localhost:9090/api/todos/${id}/undone`, requestOptions)
+            .then(response => response.json())
+            .then(data => {
+              console.log(data)
+              setTimeout(
+                () => onGetFilteredData(filters, sort, 1), 
+                100
+              );
+            });
+           
+    })
+
+
+
+    const onDeleteTodo = ((id)=>{
+        const requestOptions = {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+          };
+          fetch(`http://localhost:9090/api/todos/${id}`, requestOptions)
+          .then(response => response.json())
+          .then(data => console.log(data));
+
+          //setTimeout( onGetFilteredData(filters, sort, 1), 5000);
+          setTimeout(
+            () => onGetFilteredData(filters, sort, 1), 
+            100
+          );
+    })
+
+    return { onGetFilteredData, onAddTodo, onDeleteTodo, onUpdateTodo, onUnmarkTodo, onMarkTodo }
 
     //const 
         

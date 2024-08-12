@@ -20,6 +20,7 @@ export const todosSlice = createSlice({
             medPriorityAverage: "00:00",
             highPriorityAverage: "00:00",
         },
+        sortDateTest: null,
     },
     reducers:{
         updateData: (state, action)=>{
@@ -36,9 +37,12 @@ export const todosSlice = createSlice({
         },
         updateMetrics: (state, action) =>{
             state.metrics = action.payload;
+        },
+        updateSorDateTest: (state, action) =>{
+            state.sortDateTest = action.payload;
         }
     }
 });
 
-export const {updateData, updateFilters, updateSortByPriority, updateSoryByDate, updateMetrics} = todosSlice.actions
+export const {updateData, updateFilters, updateSortByPriority, updateSoryByDate, updateMetrics, updateSorDateTest} = todosSlice.actions
 export default todosSlice.reducer

@@ -3,15 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { PageButton } from "./PageButton";
 import { updateRequestPage } from "../pagination/paginationSlice";
 
-export function PaginationControl({getNewData}){
+
+export function PaginationControl({onGetFilteredData}){
     const dispatch = useDispatch();
     const pagination = useSelector((state)=> state.pagination.pagination)
+    //const [page, setPage] = useState(1);
     //console.log(pagination);
     //for(pagination.total_pages) to create all the pages buttons
     let pagesBtns = [];
     for(let i=1; i<=pagination.total_pages; i++){
         pagesBtns.push(
-            <PageButton getNewData={getNewData} pageNum={i} key={i} />
+            <PageButton onGetFilteredData={onGetFilteredData} pageNum={i} key={i} />
         )
     }
 
@@ -20,7 +22,7 @@ export function PaginationControl({getNewData}){
             console.log("Going to previews page: " + pagination.prev_page)
             dispatch(updateRequestPage(pagination.prev_page));
             //Get request here!
-            getNewData();
+            //getNewData();
         } else{
             console.log("No previews page found!");
         }
@@ -31,7 +33,7 @@ export function PaginationControl({getNewData}){
             console.log("Going to next page: "+pagination.next_page)
             dispatch(updateRequestPage(pagination.next_page));
             //Get request here!
-            getNewData();
+            //getNewData();
         } else{
             console.log("No next page found!");
         }

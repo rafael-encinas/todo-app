@@ -2,38 +2,32 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateFilters } from "../todos/todos";
 
-export function SearchBar({ getNewData }){
+export function SearchBar({ onGetFilteredData }){
   const sort = useSelector((state)=>state.todos.sort);
   //const page = useSelector((state)=> state.pagination.page);
   const [text, setText] = useState("");
   const [priority, setPriority] = useState(3);
+  const [state, setState] = useState(2);
   const dispatch = useDispatch();
 
   function handleSubmit(event){
     event.preventDefault();
-    console.log("Clicked on searchbar search btn!")
     let textFilter = event.target.elements.textSearch.value;
     let priorityFilter = event.target.elements.prioritySearch.value;
     let stateFilter = event.target.elements.stateSearch.value;
-/*
-    console.log("Search bar values: ")
-    console.log(textFilter);
-    console.log(priorityFilter);
-    console.log(stateFilter);
-*/
-    let filters ={
-      text: text,
-      priority: priorityFilter,
-      state: stateFilter,
+
+  let filters ={
+    text: text,
+    priority: priority,
+    state: state,
     }
-/*
-    console.log("Filters object:");
-    console.log(filters);
-*/
+
+    let page = 1;
+
     dispatch(updateFilters(filters));
 
      //Hacer GET para obtener todos sorteados
-     getNewData();
+     onGetFilteredData(filters, sort, page)
   }
 
 
@@ -62,7 +56,9 @@ export function SearchBar({ getNewData }){
         </div>
         <div>
           <label htmlFor="stateSearch" >State: </label>
-          <select defaultValue={2} name="stateSearch" id="stateSearch">
+          <select defaultValue={2} name="stateSearch" id="stateSearch"
+          onChange={e=> setState(e.target.value)}
+          >
             <option value="2">All, Done, Undone</option>
             <option value="1">Done</option>
             <option value="0">Undone</option>
