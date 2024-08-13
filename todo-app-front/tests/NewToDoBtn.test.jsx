@@ -1,7 +1,6 @@
 import React from 'react';
-import { render, screen, fireEvent, getByText } from '@testing-library/react';
-import { Provider } from 'react-redux'
-import { store } from "../src/app/store.js"
+import { render, screen, fireEvent } from '@testing-library/react';
+
 
 
 import { NewToDoBtn } from '../src/features/components/NewToDoBtn.jsx';
@@ -21,6 +20,7 @@ describe('NewToDoBtn', () => {
         render(<NewToDoBtn />)
         screen.getByText('+ New To Do');
     })
+    //Solo se hace si el texto de adentro del boton cambia
     screen.debug();
 
     it('should fire toggleModal function when user clicks it', ()=>{

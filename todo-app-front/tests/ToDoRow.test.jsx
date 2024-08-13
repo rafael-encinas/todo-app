@@ -1,9 +1,8 @@
 import React from 'react';
-import { render, screen, fireEvent, getByTestId } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, expect, vi } from 'vitest';
 
 import { ToDoRow } from "../src/features/components/ToDoRow"
-import { UpdateToDoModal } from '../src/features/components/UpdateToDoModal';
 
 const mockOnGetFilteredData = vi.fn();
 const mockOnDeleteTodo = vi.fn();
@@ -12,7 +11,7 @@ const mockOnMarkTodo = vi.fn();
 const mockUnmarkTodo = vi.fn();
 const mockMarkDone = vi.fn();
 
-const markDone = mockMarkDone;
+//const markDone = mockMarkDone;
 
 describe("ToDoRow",()=>{
     it('should render ToDoRow', ()=>{
@@ -247,13 +246,6 @@ describe("ToDoRow",()=>{
           </table> 
         )
 
-        function updateTodo(){
-            console.log("Clicked on delete todo for id:");
-            //toggleUpdateModal()
-          }
-
-
-
         const editButtonElement = screen.getByText("Edit");
         expect(editButtonElement).toBeInTheDocument();
         const modalTableCellElement = screen.getByTestId('modalLocation-test')
@@ -308,11 +300,6 @@ describe("ToDoRow",()=>{
             </tbody>
           </table> 
         )
-
-        function updateTodo(){
-            console.log("Clicked on delete todo for id:");
-            //toggleUpdateModal()
-          }
 
         const deleteButtonElement = screen.getByText("Delete");
         expect(deleteButtonElement).toBeInTheDocument();
