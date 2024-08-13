@@ -75,7 +75,12 @@ export function useTodo(){
           };
           fetch('http://localhost:9090/api/todos', requestOptions)
               .then(response => response.json())
-              .then(data => console.log(data));
+              .then(data => {
+                console.log(data)
+                if(data.id<=-1){
+                  alert(data.text);
+                }
+              });
 
               setTimeout(
                 () => onGetFilteredData(filters, sort, page), 
@@ -94,6 +99,9 @@ export function useTodo(){
             .then(response => response.json())
             .then(data => {
               console.log(data)
+              if(data.id<=-1){
+                alert(data.text);
+              }
               setTimeout(
                 () => onGetFilteredData(filters, sort, page), 
                 100
@@ -114,6 +122,9 @@ export function useTodo(){
             .then(response => response.json())
             .then(data => {
               console.log(data)
+              if(data.id<=-1){
+                alert(data.text);
+              }
               setTimeout(
                 () => onGetFilteredData(filters, sort, page), 
                 100
@@ -134,6 +145,9 @@ export function useTodo(){
             .then(response => response.json())
             .then(data => {
               console.log(data)
+              if(data.id<=-1){
+                alert(data.text);
+              }
               setTimeout(
                 () => onGetFilteredData(filters, sort, page), 
                 100
@@ -151,7 +165,12 @@ export function useTodo(){
           };
           fetch(`http://localhost:9090/api/todos/${id}`, requestOptions)
           .then(response => response.json())
-          .then(data => console.log(data));
+          .then(data => {
+            console.log(data)
+            if(data.id<=-1){
+              alert(data.text);
+            }
+          });
 
           //setTimeout( onGetFilteredData(filters, sort, page), 5000);
           setTimeout(

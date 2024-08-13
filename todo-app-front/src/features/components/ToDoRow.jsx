@@ -14,17 +14,6 @@ export function ToDoRow({ onGetFilteredData, onDeleteTodo, toDo, onUpdateTodo, o
       //const page = useSelector((state)=> state.pagination.requestPage.page);
     const page = 1;
     let checked = toDo.doneState?"checked":null;
-    
-    /*
-    if(toDo.priority == 1){
-      setPriorityText("Medium");
-      }
-    else if(toDo.priority == 2){
-      setPriorityText("High");
-    } else {
-      setPriorityText("Low");
-    }
-    */
 
     function toggleUpdateModal(){
       setUpdateTodoModalState(!updateTodoModalState);

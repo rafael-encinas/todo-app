@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React from "react";
+//import { useDispatch, useSelector } from "react-redux";
 
 export function NewTodoModal({onAddTodo, toggleModal }){
   //Convertir de div a form, utilizar los datos del form para validacion
@@ -45,10 +45,10 @@ export function NewTodoModal({onAddTodo, toggleModal }){
         <div>New "To Do"</div>
         <div className='inputContainer'>
           <label htmlFor="text">Text: (Maximum 120 characters allowed)</label>
-          <textarea name="text" id="text" required maxLength={120} rows={3}></textarea>
+          <textarea name="text" id="text" required maxLength={120} rows={3} placeholder="Finish project!"></textarea>
         </div>
         <div className='inputContainer'>
-        <label htmlFor="priority" >Priority: </label>
+        <label htmlFor="priority" >Priority:</label>
           <select name="priority" id="priority" required>
             <option value="0">Low</option>
             <option value="1">Medium</option>
