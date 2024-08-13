@@ -8,8 +8,8 @@ export function ToDoRow({ onGetFilteredData, onDeleteTodo, toDo, onUpdateTodo, o
     //const { onDeleteTodo } = useTodo();
     const [updateTodoModalState, setUpdateTodoModalState] = useState(false);
     const [todoState, setTodoState] = useState(toDo.doneState)
-    const filters = useSelector((state)=> state.todos.filters);
-    const sort = useSelector((state)=> state.todos.sort);
+    //const filters = useSelector((state)=> state.todos.filters);
+    //const sort = useSelector((state)=> state.todos.sort);
     const [priorityText, setPriorityText] = useState("Low");
       //const page = useSelector((state)=> state.pagination.requestPage.page);
     const page = 1;
@@ -41,16 +41,16 @@ export function ToDoRow({ onGetFilteredData, onDeleteTodo, toDo, onUpdateTodo, o
     return(
       <tr>          
         <td className='colState'>
-          <input type="checkbox" name="" id={toDo.id} defaultChecked={todoState}
+          <input data-testid='checkbox-test' type="checkbox" name="todoCheckbox" id={toDo.id} defaultChecked={todoState}
            onChange={()=> {
             setTodoState(!todoState);
             markDone();
            }}
           /></td> 
-        <td>{toDo.text}</td>  
-        <td>{toDo.priority==0?"Low":toDo.priority==1?"Medium":"High"}</td> 
-        <td>{toDo.dueDate!=null?toDo.dueDate:"-"}</td> 
-        <td>
+        <td data-testid='text-test'>{toDo.text}</td>  
+        <td data-testid='priority-test'>{toDo.priority==0?"Low":toDo.priority==1?"Medium":"High"}</td> 
+        <td data-testid='dueDate-test'>{toDo.dueDate!=null?toDo.dueDate:"-"}</td> 
+        <td data-testid='modalLocation-test'>
           <button className='generalBtn'
             onClick={updateTodo}
             >

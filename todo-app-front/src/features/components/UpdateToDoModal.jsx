@@ -9,9 +9,9 @@ export function UpdateToDoModal({ toggleUpdateModal, toDo, onUpdateTodo }){
   const [priority, setPriority] = useState(toDo.priority);
   const [dueDate, setDueDate] = useState(toDo.dueDate);
 
-  const filters = useSelector((state)=> state.todos.filters);
-  const sort = useSelector((state)=> state.todos.sort);
-  const page = useSelector((state)=> state.pagination.requestPage.page);
+  //const filters = useSelector((state)=> state.todos.filters);
+  //const sort = useSelector((state)=> state.todos.sort);
+  //const page = useSelector((state)=> state.pagination.requestPage.page);
   
 
   console.log("DueDate for todo with id: "+ toDo.id + " -> " + dueDate);
@@ -61,7 +61,7 @@ export function UpdateToDoModal({ toggleUpdateModal, toDo, onUpdateTodo }){
           <textarea name="text" id="text" required maxLength={120} rows={3} value={text} onChange={e=> setText(e.target.value)} ></textarea>
         </div>
         <div className='inputContainer'>
-        <label htmlFor="priority" >Priority: </label>
+        <label htmlFor="priority" >Priority:</label>
           <select name="priority" id="priority" value={priority} onChange={e=> setPriority(e.target.value)} required>
             <option value="0">Low</option>
             <option value="1">Medium</option>
