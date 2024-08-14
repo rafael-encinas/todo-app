@@ -51,7 +51,7 @@ public class TodoappApplication {
 		//@CrossOrigin(origins = "http://localhost:8080")
 		@GetMapping(value = "/getall")
 		public ResponseEntity<ArrayList<Todo>> findAll(@RequestParam Map<String,String> allParams){
-			ArrayList<Todo> todos = repository.findAll(allParams);
+			ArrayList<Todo> todos = repository.findAll();
 			if (todos.isEmpty()){
 				System.out.println("todos is empty!");
                 return ResponseEntity.noContent().build();
@@ -261,7 +261,7 @@ public class TodoappApplication {
 			return todo; //"Todo created succesfully";
 		}
 
-		ArrayList<Todo> findAll(Map<String,String> allParams){
+		ArrayList<Todo> findAll(){
 			//From allParams, filter todos arraylist
 			/* Parameters:
 				- page: for pagination
@@ -276,6 +276,7 @@ public class TodoappApplication {
 			updateTimesArrays();
 			ArrayList<Todo> filterdArray = (ArrayList)todos.clone();
 			
+			/* 
 			System.out.println(allParams);
 
 			//Sort by priority
@@ -292,7 +293,7 @@ public class TodoappApplication {
 
 			//Filter by text
 			if(allParams.containsKey("text")) filterdArray = filterByText(filterdArray, allParams.get("text"));
-
+			*/
 			return filterdArray;
 		}
 
