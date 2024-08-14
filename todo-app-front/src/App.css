@@ -1,0 +1,174 @@
+:root{
+  --white-color: rgba(255, 255, 255, 0.87);
+  --darkgrey-color: rgb(61, 61, 61);
+  --lightgrey-color: rgb(93, 93, 93);
+}
+
+#root {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+  text-align: center;
+  display: flex;
+  flex-grow: 1;
+  align-items: start;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.searchBar{
+  width: 100%;
+  position: relative;
+  box-sizing: border-box;
+  padding: 25px;
+  border: 1px solid var(--white-color);
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 5px;
+}
+
+.generalBtn{
+  box-sizing: border-box;
+  padding: 5px 15px;
+  background-color: var(--darkgrey-color);
+  border-radius: 5px;
+  border: 1px solid var(--white-color);
+  transition: 50ms;
+  &:hover{
+    background-color: var(--lightgrey-color);
+    cursor: pointer;
+  }
+  &:active{
+    background-color: var(--darkgrey-color);
+  }
+}
+
+.searchBtn{
+  position: absolute;
+  right: 25px;
+  bottom: 25px;
+}
+
+.newToDoBtn{
+  align-self: left;
+}
+
+.tableContainer{
+  overflow-x: auto;
+  width: 100%;
+  & > table{
+    border: 1px solid var(--white-color);
+    border-collapse: collapse;
+    width: 100%;
+  }
+}
+
+td{
+  border: 1px solid var(--white-color);
+  text-align: start;
+  padding: 5px 10px;
+}
+
+.colState{
+  width: 40px;
+  text-align: center;
+}
+
+.colName{
+  width: fit-content;
+
+}
+
+.colPriority{
+  width: 80px;
+}
+
+.colDueDate{
+  width: 100px;
+}
+
+.colActions{
+  width: 150px;
+}
+
+.paginationControl{
+  margin-top: 50px;
+  align-self: center;
+
+  box-sizing: border-box;
+  padding: 20px 100px;
+  border: 1px solid var(--white-color);
+}
+
+.paginationText{
+  margin-top: 5px;
+  font-size: smaller;
+}
+
+.metricsContainer{
+  box-sizing: border-box;
+  border: 1px solid var(--white-color);
+  padding: 20px 40px;
+  width: 100%;
+
+  display: grid;
+  grid-template-columns: 50% 50%;
+  justify-content: start;
+  align-items: start;
+}
+
+.newToDoModal{
+  width: 450px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  border: 1px solid var(--white-color);
+  padding: 10px 25px;
+  gap: 10px;
+
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  background-color: black;
+}
+
+.inputContainer{
+  display: flex;
+  flex-direction: column;
+  text-align: start;
+}
+
+.btnsContainer{
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: end;
+  & > .saveTodoBtn{
+    transition: 50ms;
+    background-color: #1b69dc;
+    &:hover{
+      background-color: #3e86f1;
+    }
+    &:active{
+      background-color: #1b69dc;
+    }
+  }
+}
+
+.currentPage{
+    transition: 50ms;
+    background-color: #1b69dc;
+    &:hover{
+      background-color: #3e86f1;
+    }
+    &:active{
+      background-color: #1b69dc;
+    }
+}
+
+.noDataContainer{
+  width: 100%;
+}
