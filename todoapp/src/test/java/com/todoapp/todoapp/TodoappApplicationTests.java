@@ -5,9 +5,13 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import com.todoapp.todoapp.TodoappApplication.Todo;
-import com.todoapp.todoapp.TodoappApplication.TodoResource;
-import com.todoapp.todoapp.TodoappApplication.TodosInMemoryRepository;
+//import com.todoapp.todoapp.TodoappApplication.Todo;
+//import com.todoapp.todoapp.TodoappApplication.TodoResource;
+import com.todoapp.todoapp.TodoappController;
+//import com.todoapp.todoapp.TodoappApplication.TodosInMemoryRepository;
+import com.todoapp.todoapp.repository.TodosInMemoryRepository;
+import com.todoapp.todoapp.models.Todo;
+
 import java.util.ArrayList;
 
 
@@ -17,7 +21,7 @@ import java.util.ArrayList;
 class TodoappApplicationTests {
 
 	@Autowired
-	private TodoResource TodoController;
+	private TodoappController TodoController;
 
 	@Test 
 	void contextLoads() throws Exception{

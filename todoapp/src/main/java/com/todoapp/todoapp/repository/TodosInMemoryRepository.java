@@ -1,4 +1,4 @@
-package com.todoapp.todoapp;
+package com.todoapp.todoapp.repository;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -8,139 +8,18 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.todoapp.todoapp.models.Metrics;
 import com.todoapp.todoapp.models.Pagination;
 import com.todoapp.todoapp.models.Response;
 import com.todoapp.todoapp.models.Todo;
-import com.todoapp.todoapp.repository.TodosInMemoryRepository;
 
-@SpringBootApplication
-public class TodoappApplication {
+import org.springframework.stereotype.Repository;
 
-	public static void main(String[] args) {
-		SpringApplication.run(TodoappApplication.class, args);
-	}
-/* 
-	@RestController
-	@CrossOrigin
-	@RequestMapping("/api/todos")
-	static class TodoResource {
-		private TodosInMemoryRepository repository = new TodosInMemoryRepository();
+@Repository
+public class TodosInMemoryRepository {
 
-		TodoResource(TodosInMemoryRepository repository){
-			this.repository = repository;
-		}
-
-		@CrossOrigin(origins = "http://localhost:8080")
-		@GetMapping
-		public ResponseEntity<Response> findPagination(@RequestParam Map<String,String> allParams){
-			Response response = repository.findPagination(allParams);
-            return ResponseEntity.ok(response);
-		}
-
-		//@CrossOrigin(origins = "http://localhost:8080")
-		@GetMapping(value = "/getall")
-		public ResponseEntity<ArrayList<Todo>> findAll(@RequestParam Map<String,String> allParams){
-			ArrayList<Todo> todos = repository.findAll();
-			if (todos.isEmpty()){
-				System.out.println("todos is empty!");
-                return ResponseEntity.noContent().build();
-			}
-            return ResponseEntity.ok(todos);
-		}
-		
-	//	@CrossOrigin(origins = "http://localhost:8080")
-		@PostMapping
-		public ResponseEntity<Todo> saveTodo(@RequestBody Todo todo){
-			int maxTextLength = 120;
-			int minTextLength = 1;
-			Todo todoPostError = new Todo();
-			boolean textLengthCheck = false;
-			if(todo.getText().length() <= maxTextLength && todo.getText().length() >= minTextLength) {
-				textLengthCheck = true;
-			} else{
-				todoPostError.setText("Error: Text must have between 1 and 120 characters. Try again");
-				todoPostError.setId(-1);
-				return ResponseEntity.ok(todoPostError);
-			}
-			
-			boolean prioritySetCheck = false;
-			if(todo.getPriority() <= 2 && todo.getPriority() >= 0) {
-				prioritySetCheck = true;
-			} else{
-				todoPostError.setText("Error: Priority must between 0 and 2. Try again");
-				todoPostError.setId(-1);
-				return ResponseEntity.ok(todoPostError);
-			}
-			return ResponseEntity.ok(repository.saveTodo(todo));
-
-		}
-
-	//	@CrossOrigin(origins = "http://localhost:8080")
-		@PutMapping("/{id}")
-		public ResponseEntity<Todo> updateTodo(@PathVariable int id, @RequestBody Todo todo) {
-			int maxTextLength = 120;
-			int minTextLength = 1;
-			Todo todoPostError = new Todo();
-			boolean textLengthCheck = false;
-			if(todo.getText().length() <= maxTextLength && todo.getText().length() >= minTextLength) {
-				textLengthCheck = true;
-			} else{
-				todoPostError.setText("Error: Text must have between 1 and 120 characters. Try again");
-				todoPostError.setId(-1);
-				return ResponseEntity.ok(todoPostError);
-			}
-			boolean prioritySetCheck = false;
-			if(todo.getPriority() <= 2 && todo.getPriority() >= 0) {
-				prioritySetCheck = true;
-			} else{
-				todoPostError.setText("Error: Priority must between 0 and 2. Try again");
-				todoPostError.setId(-1);
-				return ResponseEntity.ok(todoPostError);
-			}
-			return ResponseEntity.ok(repository.updateTodo(id, todo));
-			}
-
-		//Post /todos/{id}/done to mark "todo" as done
-	//	@CrossOrigin(origins = "http://localhost:8080")
-		@PostMapping("/{id}/done")
-		public ResponseEntity<Todo> markDone(@PathVariable int id) {
-			return ResponseEntity.ok(repository.markDone(id));
-		}
-		
-		//Put /todos/{id}/undone to mark "todo" as undone
-	//	@CrossOrigin(origins = "http://localhost:8080")
-		@PutMapping("/{id}/undone")
-		public ResponseEntity<Todo> markUndone(@PathVariable int id) {
-			return ResponseEntity.ok(repository.markUndone(id));
-		}
-
-	//	@CrossOrigin(origins = "http://localhost:8080")
-		@DeleteMapping(value = "/{id}")
-		public ResponseEntity<Todo> deleteTodo(@PathVariable("id") int id){
-			return ResponseEntity.ok(repository.deleteTodo(id));
-		}
-	}
-	*/
-/* 
-	@Repository
-	static class TodosInMemoryRepository {
+	public TodosInMemoryRepository(){}
+    
 		private ArrayList<Todo> todos = new ArrayList<>();
 		
 		int lastId=0;
@@ -182,11 +61,14 @@ public class TodoappApplication {
 			for(int j=0; j<todos.size(); j++){
 				if(todos.get(j).isDoneState()){
 					if(todos.get(j).getPriority()==0){
-						lowPriorityTimes.add(timeDiffString(todos.get(j).getCreationDate(), todos.get(j).getDoneDate()));	//Get time difference in seconds and store it
+						//Get time difference in seconds and store it
+						lowPriorityTimes.add(timeDiffString(todos.get(j).getCreationDate(), todos.get(j).getDoneDate()));	
 					} else if(todos.get(j).getPriority()==1){
-						medPriorityTimes.add(timeDiffString(todos.get(j).getCreationDate(), todos.get(j).getDoneDate()));	//Get time difference in seconds and store it
+						//Get time difference in seconds and store it
+						medPriorityTimes.add(timeDiffString(todos.get(j).getCreationDate(), todos.get(j).getDoneDate()));	
 					} else{
-						highPriorityTimes.add(timeDiffString(todos.get(j).getCreationDate(), todos.get(j).getDoneDate()));	//Get time difference in seconds and store it
+						//Get time difference in seconds and store it
+						highPriorityTimes.add(timeDiffString(todos.get(j).getCreationDate(), todos.get(j).getDoneDate()));	
 					}
 				}
 			}
@@ -260,7 +142,7 @@ public class TodoappApplication {
 			return displayMinutes + ":" + displaySeconds;
 		}
 
-		Todo saveTodo(Todo todo){
+		public Todo saveTodo(Todo todo){
 			todo.setId(lastId+1);
 			todo.setCreationDate(ldtToString(LocalDateTime.now()));
 			todos.add(todo);
@@ -268,7 +150,7 @@ public class TodoappApplication {
 			return todo; //"Todo created succesfully";
 		}
 
-		ArrayList<Todo> findAll(){
+		public ArrayList<Todo> findAll(){
 			//From allParams, filter todos arraylist
 			/* Parameters:
 				- page: for pagination
@@ -277,7 +159,7 @@ public class TodoappApplication {
 				- priority: low=0, med=1, high=2, all=3 - DONE
 				- state:  undone=0, done=1, all=2,		- DONE
 				- text: text content					- DONE
-			
+			*/
 			//output from one filter is fed as input for next filter
 
 			updateTimesArrays();
@@ -300,7 +182,7 @@ public class TodoappApplication {
 
 			//Filter by text
 			if(allParams.containsKey("text")) filterdArray = filterByText(filterdArray, allParams.get("text"));
-			
+			*/
 			return filterdArray;
 		}
 
@@ -367,14 +249,14 @@ public class TodoappApplication {
 			return arraylist;
 		}
 		
-		Response findPagination(Map<String,String> allParams){			
+		public Response findPagination(Map<String,String> allParams){			
 			/*
 			 * Return: 
 			 *  - array[0, 9]
 			 *  - Total number of todos
 			 *  - Total number of todos after filters
 			 *  - metrics
-			 
+			 */
 			//From allParams, filter todos arraylist
 			/* Parameters:
 				- page: for pagination
@@ -383,7 +265,7 @@ public class TodoappApplication {
 				- priority: low=0, med=1, high=2, all=3 - DONE
 				- state:  undone=0, done=1, all=2,		- DONE
 				- text: text content					- DONE
-			
+			*/
 			//output from one filter is fed as input for next filter
 
 			updateTimesArrays();
@@ -444,7 +326,7 @@ public class TodoappApplication {
 			 return response;
 			}
 			
-		Todo updateTodo(int id, Todo todo){
+		public Todo updateTodo(int id, Todo todo){
 			System.out.println("Trying to update todo with id: " + id);
 			//Look for todo with id=id, gets a -1 if not found
 			int elementIndex = getIndexFromId(id);
@@ -460,7 +342,7 @@ public class TodoappApplication {
 			return todos.get(elementIndex);
 		}
 
-		Todo markDone(int id){
+		public Todo markDone(int id){
 			System.out.println("Trying to mark todo as done for id: " + id);
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
@@ -477,7 +359,7 @@ public class TodoappApplication {
 			return todos.get(elementIndex);
 		} 
 
-		Todo markUndone(int id){
+		public Todo markUndone(int id){
 			System.out.println("Trying to mark todo as undone for id: " + id);
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
@@ -495,7 +377,7 @@ public class TodoappApplication {
 			return todos.get(elementIndex);
 		} 
 
-		Todo deleteTodo(int id){
+		public Todo deleteTodo(int id){
 			int elementIndex = getIndexFromId(id);
 			Todo todoToDelete = new Todo();
 			if(elementIndex>-1){
@@ -510,221 +392,4 @@ public class TodoappApplication {
 			}
 			return todoToDelete;
 		}
-	}
-	*/
-/* 
-	static class Todo{
-		private int id;
-		private String text;
-		private String dueDate;
-		private boolean doneState;
-		private String doneDate;
-		private int priority;
-		private String creationDate;
-
-		public Todo(int id, String text, String dueDate, boolean doneState, String doneDate, int priority, String creationDate){
-			this.id =id;
-			this.text = text;
-			this.dueDate = dueDate;
-			this.doneState = doneState;
-			this.doneDate = doneDate;
-			this.priority = priority;
-			this.creationDate = creationDate;
-		}
-
-		public Todo(){
-
-		}
-
-		public int getId() {
-			return id;
-		}
-		public void setId(int id) {
-			this.id = id;
-		}
-		public String getText() {
-			return text;
-		}
-		public void setText(String text) {
-			this.text = text;
-		}
-		public String getDueDate() {
-			return dueDate;
-		}
-		public void setDueDate(String dueDate) {
-			this.dueDate = dueDate;
-		}
-		public boolean isDoneState() {
-			return doneState;
-		}
-		public void setDoneState(boolean doneState) {
-			this.doneState = doneState;
-		}
-		public String getDoneDate() {
-			return doneDate;
-		}
-		public void setDoneDate(String doneDate) {
-			this.doneDate = doneDate;
-		}
-		public int getPriority() {
-			return priority;
-		}
-		public void setPriority(int priority) {
-			this.priority = priority;
-		}
-		public String getCreationDate() {
-			return creationDate;
-		}
-		public void setCreationDate(String creationDate) {
-			this.creationDate = creationDate;
-		}
-	}
- */
-/* 
-	static class Response {
-		List<Todo> data;
-		Pagination pagination;
-		Metrics metrics;
-		public Response(List<Todo> data, Pagination pagination, Metrics metrics) {
-			this.data = data;
-			this.pagination = pagination;
-			this.metrics = metrics;
-		}
-
-		public Response(){
-
-		}
-		public List<Todo> getData() {
-			return data;
-		}
-		public void setData(List<Todo> data) {
-			this.data = data;
-		}
-		public Pagination getPagination() {
-			return pagination;
-		}
-		public void setPagination(Pagination pagination) {
-			this.pagination = pagination;
-		}
-		public Metrics getMetrics() {
-			return metrics;
-		}
-		public void setMetrics(Metrics metrics) {
-			this.metrics = metrics;
-		}
-	}
-	*/
-	/* 
-	static class Pagination {
-		int total_records;
-		int total_filtered;
-		int current_page;
-		int total_pages;
-		Integer next_page;
-		Integer prev_page;
-
-		public Pagination(int total_records, int total_filtered, int current_page, int total_pages, Integer next_page,
-				Integer prev_page) {
-			this.total_records = total_records;
-			this.total_filtered = total_filtered;
-			this.current_page = current_page;
-			this.total_pages = total_pages;
-			this.next_page = next_page;
-			this.prev_page = prev_page;
-		}
-
-		public Pagination(){
-
-		}
-
-		public int getTotal_records() {
-			return total_records;
-		}
-		public void setTotal_records(int total_records) {
-			this.total_records = total_records;
-		}
-		public int getTotal_filtered() {
-			return total_filtered;
-		}
-		public void setTotal_filtered(int total_filtered) {
-			this.total_filtered = total_filtered;
-		}
-		public int getCurrent_page() {
-			return current_page;
-		}
-		public void setCurrent_page(int current_page) {
-			this.current_page = current_page;
-		}
-		public int getTotal_pages() {
-			return total_pages;
-		}
-		public void setTotal_pages(int total_pages) {
-			this.total_pages = total_pages;
-		}
-		public int getNext_page() {
-			return next_page;
-		}
-		public void setNext_page(Integer next_page) {
-			this.next_page = next_page;
-		}
-		public Integer getPrev_page() {
-			return prev_page;
-		}
-		public void setPrev_page(Integer prev_page) {
-			this.prev_page = prev_page;
-		}
-	}
-	*/
-/* 
-	static class Metrics {
-		String overallAverage;
-		String lowPriorityAverage;
-		String medPriorityAverage;
-		String highPriorityAverage;
-
-		public Metrics(String overallAverage, String lowPriorityAverage, String medPriorityAverage,
-				String highPriorityAverage) {
-			this.overallAverage = overallAverage;
-			this.lowPriorityAverage = lowPriorityAverage;
-			this.medPriorityAverage = medPriorityAverage;
-			this.highPriorityAverage = highPriorityAverage;
-		}
-
-		public Metrics(){
-
-		}
-
-		public String getOverallAverage() {
-			return overallAverage;
-		}
-
-		public void setOverallAverage(String overallAverage) {
-			this.overallAverage = overallAverage;
-		}
-
-		public String getLowPriorityAverage() {
-			return lowPriorityAverage;
-		}
-
-		public void setLowPriorityAverage(String lowPriorityAverage) {
-			this.lowPriorityAverage = lowPriorityAverage;
-		}
-
-		public String getMedPriorityAverage() {
-			return medPriorityAverage;
-		}
-
-		public void setMedPriorityAverage(String medPriorityAverage) {
-			this.medPriorityAverage = medPriorityAverage;
-		}
-
-		public String getHighPriorityAverage() {
-			return highPriorityAverage;
-		}
-
-		public void setHighPriorityAverage(String highPriorityAverage) {
-			this.highPriorityAverage = highPriorityAverage;
-		}
-	}
-*/
 }
