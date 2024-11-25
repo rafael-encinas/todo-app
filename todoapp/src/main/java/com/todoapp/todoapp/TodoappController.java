@@ -33,14 +33,13 @@ public class TodoappController {
 			this.repository = repository;
 		}
 
-		@CrossOrigin(origins = "http://localhost:8080")
+		@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5501", "http://127.0.0.1:5501"})
 		@GetMapping
 		public ResponseEntity<Response> findPagination(@RequestParam Map<String,String> allParams){
 			Response response = repository.findPagination(allParams);
             return ResponseEntity.ok(response);
 		}
 
-		//@CrossOrigin(origins = "http://localhost:8080")
 		@GetMapping(value = "/getall")
 		public ResponseEntity<ArrayList<Todo>> findAll(@RequestParam Map<String,String> allParams){
 			ArrayList<Todo> todos = repository.findAll();
@@ -51,7 +50,7 @@ public class TodoappController {
             return ResponseEntity.ok(todos);
 		}
 		
-	//	@CrossOrigin(origins = "http://localhost:8080")
+
 		@PostMapping
 		public ResponseEntity<Todo> saveTodo(@RequestBody Todo todo){
 			int maxTextLength = 120;
@@ -78,7 +77,6 @@ public class TodoappController {
 
 		}
 
-	//	@CrossOrigin(origins = "http://localhost:8080")
 		@PutMapping("/{id}")
 		public ResponseEntity<Todo> updateTodo(@PathVariable int id, @RequestBody Todo todo) {
 			int maxTextLength = 120;
@@ -104,20 +102,19 @@ public class TodoappController {
 			}
 
 		//Post /todos/{id}/done to mark "todo" as done
-	//	@CrossOrigin(origins = "http://localhost:8080")
+
 		@PostMapping("/{id}/done")
 		public ResponseEntity<Todo> markDone(@PathVariable int id) {
 			return ResponseEntity.ok(repository.markDone(id));
 		}
 		
 		//Put /todos/{id}/undone to mark "todo" as undone
-	//	@CrossOrigin(origins = "http://localhost:8080")
+
 		@PutMapping("/{id}/undone")
 		public ResponseEntity<Todo> markUndone(@PathVariable int id) {
 			return ResponseEntity.ok(repository.markUndone(id));
 		}
 
-	//	@CrossOrigin(origins = "http://localhost:8080")
 		@DeleteMapping(value = "/{id}")
 		public ResponseEntity<Todo> deleteTodo(@PathVariable("id") int id){
 			return ResponseEntity.ok(repository.deleteTodo(id));
