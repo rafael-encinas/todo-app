@@ -20,21 +20,23 @@ import { useTodo } from './features/hooks/useTodo.JS';
 
 function App() {
   const [modalState, setModalState] = useState(false);
-  
+
+  //variable de entorno para identificar el modo, si es desarrollo o produccion
   const todosArr = useSelector((state)=> state.todos.data);
   const filters = useSelector((state)=> state.todos.filters);
   const sort = useSelector((state)=> state.todos.sort);
   const page = useSelector((state)=> state.pagination.requestPage.page);
   const dispatch = useDispatch();
+  const devModeConst = import.meta.env.DEV;
 
-  const { onGetFilteredData, onAddTodo, onDeleteTodo, onUpdateTodo, onUnmarkTodo, onMarkTodo } = useTodo();
+  const { onGetFilteredData, onAddTodo, onDeleteTodo, onUpdateTodo, onUnmarkTodo, onMarkTodo, onGenerateTodos } = useTodo();
 
 
   function toggleModal(){
     setModalState(!modalState);
   }
 
-
+  
 
   function getNewData(){
     console.log("Time to get data!");
@@ -83,6 +85,7 @@ function App() {
       <PaginationControl onGetFilteredData={onGetFilteredData}  />
       <Metrics />
       {modalState? <NewTodoModal getNewData={getNewData} onAddTodo={onAddTodo} toggleModal={toggleModal}/> :null}
+      {devModeConst? <button onClick={onGenerateTodos}>Generate Todos</button>:null}
     </>
   )
 }
