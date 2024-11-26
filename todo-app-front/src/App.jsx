@@ -57,9 +57,6 @@ function App() {
       requestString += `&sortByDate=${sort.sortByDate}`;
     }
     
-    console.log("requestString: " + requestString);
-    
-    //console.log("sortByPriority: " + sort.sortByPrioirty);
     const requestOptions = {
       method: 'GET',
       headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -77,6 +74,7 @@ function App() {
 
   return (
     <>
+    <div className='topContainer'>
       <SearchBar onGetFilteredData={onGetFilteredData} />
       <NewToDoBtn   toggleModal={toggleModal}  />
       {
@@ -85,10 +83,14 @@ function App() {
         :
         <EmptyData />
       }
+      </div>
+      <div className='bottomContainer'>
       <PaginationControl onGetFilteredData={onGetFilteredData}  />
       <Metrics />
       {modalState? <NewTodoModal getNewData={getNewData} onAddTodo={onAddTodo} toggleModal={toggleModal}/> :null}
-      {devModeConst? <button onClick={devModeGenerator}>Generate Todos</button>:null}
+      {devModeConst? <button onClick={devModeGenerator} id='devModeBtn'>Generate Todos</button>:null}
+      </div>
+      
     </>
   )
 }

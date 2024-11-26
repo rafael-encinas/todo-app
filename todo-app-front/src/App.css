@@ -4,17 +4,44 @@
   --lightgrey-color: rgb(93, 93, 93);
 }
 
+body{
+  margin: 0;
+  padding: 0;
+}
+
 #root {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 1.2rem;
   text-align: center;
   display: flex;
   flex-grow: 1;
   align-items: start;
+  justify-content: space-between;
+  flex-direction: column;
+  position: relative;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+#devModeBtn{
+  position:absolute;
+  top: 0;
+  left: 0;
+}
+
+.topContainer, .bottomContainer{
+  width: 100%;
+  display: flex;
+  /*flex-grow: 1;*/
+  align-items: start;
   flex-direction: column;
   gap: 10px;
   position: relative;
+}
+
+.bottomContainer{
+  align-items: end;
 }
 
 .searchBar{
