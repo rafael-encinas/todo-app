@@ -1,5 +1,4 @@
 import React from "react";
-//import { useDispatch, useSelector } from "react-redux";
 
 export function NewTodoModal({onAddTodo, toggleModal }){
   //Convertir de div a form, utilizar los datos del form para validacion
@@ -9,23 +8,19 @@ export function NewTodoModal({onAddTodo, toggleModal }){
     let textInput = event.target.elements.text.value;
     let priorityInput = event.target.elements.priority.value;
     let dueDateInput = event.target.elements.dueDate.value;
-    console.log("Clicked submit!");
-    console.log(textInput.length);
-    console.log(event.target.elements.priority.value);
-    console.log(event.target.elements.dueDate.value);
 
     let textLengthCheck = false;
     if(textInput.length >= 1 && textInput.length <= 120){
       textLengthCheck = true;
     } else {
-      console.log("The number of characters for text should be between 1 and 120, try again.")
+      alert("The number of characters for text should be between 1 and 120, try again.")
     }
 
     let priorityCheck = false;
     if(priorityInput>=0 && priorityInput<=2){
       priorityCheck = true;
     } else{
-      console.log("Priority should be 0, 1, or 2, try again.")
+      alert("Priority should be 0, 1, or 2, try again.")
     }
 
     if(dueDateInput.length<=0){
@@ -60,7 +55,7 @@ export function NewTodoModal({onAddTodo, toggleModal }){
           <input type="date" name="dueDate" id="dueDate" />
         </div>
         <div className='btnsContainer'>
-          <button className='generalBtn' onClick={toggleModal}>Cancel</button>
+          <button type="button" className='generalBtn' onClick={toggleModal}>Cancel</button>
           <button type='submit' className='generalBtn saveTodoBtn'>Save</button>
         </div>
       </form>

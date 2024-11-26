@@ -9,13 +9,6 @@ export function UpdateToDoModal({ toggleUpdateModal, toDo, onUpdateTodo }){
   const [priority, setPriority] = useState(toDo.priority);
   const [dueDate, setDueDate] = useState(toDo.dueDate);
 
-  //const filters = useSelector((state)=> state.todos.filters);
-  //const sort = useSelector((state)=> state.todos.sort);
-  //const page = useSelector((state)=> state.pagination.requestPage.page);
-  
-
-  console.log("DueDate for todo with id: "+ toDo.id + " -> " + dueDate);
-
   function handleSubmit(event){
     event.preventDefault();
     let textInput = event.target.elements.text.value;
@@ -26,14 +19,14 @@ export function UpdateToDoModal({ toggleUpdateModal, toDo, onUpdateTodo }){
     if(text.length >= 1 && textInput.length <= 120){
       textLengthCheck = true;
     } else {
-      console.log("The number of characters for text should be between 1 and 120, try again.")
+      alert("The number of characters for text should be between 1 and 120, try again.")
     }
 
     let priorityCheck = false;
     if(priority>=0 && priorityInput<=2){
       priorityCheck = true;
     } else{
-      console.log("Priority should be 0, 1, or 2, try again.")
+      alert("Priority should be 0, 1, or 2, try again.")
     }
 
     //if duedate is an empty string, set to null
@@ -44,11 +37,7 @@ export function UpdateToDoModal({ toggleUpdateModal, toDo, onUpdateTodo }){
     }
 
     if(textLengthCheck && priorityCheck){
-      //setDueDate("1111-22-33")
-      //console.log(dueDate);
-      console.log("DueDate from modal: " + dueDate);
       onUpdateTodo(text, dueDate, priority, toDo.id);
-
       toggleUpdateModal();
     }
   }

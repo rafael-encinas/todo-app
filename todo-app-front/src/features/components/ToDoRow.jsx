@@ -20,21 +20,17 @@ export function ToDoRow({ onGetFilteredData, onDeleteTodo, toDo, onUpdateTodo, o
     }
 
     function deleteTodo(){
-      console.log("Clicked on delete todo for id: " + toDo.id);
       onDeleteTodo(toDo.id);
     }
 
     function updateTodo(){
-      console.log("Clicked on delete todo for id: " + toDo.id);
       toggleUpdateModal()
     }
 
     function markDone(){
       if(!todoState){
-        console.log("Changed to DONE!");
         onMarkTodo(toDo.id);
       } else {
-        console.log("Changed to UNDONE");
         onUnmarkTodo(toDo.id);
       }
     }

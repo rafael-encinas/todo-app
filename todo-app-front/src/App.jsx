@@ -17,6 +17,8 @@ import { useDispatch } from 'react-redux';
 import { updateData, updateMetrics } from './features/todos/todos';
 import { updatePagination } from './features/pagination/paginationSlice';
 import { useTodo } from './features/hooks/useTodo.JS';
+import { devModeGenerator } from './features/devModeGenerator/devModeGenerator';
+
 
 function App() {
   const [modalState, setModalState] = useState(false);
@@ -28,8 +30,9 @@ function App() {
   const page = useSelector((state)=> state.pagination.requestPage.page);
   const dispatch = useDispatch();
   const devModeConst = import.meta.env.DEV;
+  const apiUrl = import.meta.env.VITE_API_URL;
 
-  const { onGetFilteredData, onAddTodo, onDeleteTodo, onUpdateTodo, onUnmarkTodo, onMarkTodo, onGenerateTodos } = useTodo();
+  const { onGetFilteredData, onAddTodo, onDeleteTodo, onUpdateTodo, onUnmarkTodo, onMarkTodo } = useTodo();
 
 
   function toggleModal(){
@@ -62,7 +65,7 @@ function App() {
       headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
     }
     
-    fetch(`http://localhost:9090/api/todos?${requestString}`, requestOptions)
+    fetch(apiUrl + `/api/todos?${requestString}`, requestOptions)
       .then(response=>response.json())
       .then(data=> {
         console.log(data);
@@ -85,7 +88,7 @@ function App() {
       <PaginationControl onGetFilteredData={onGetFilteredData}  />
       <Metrics />
       {modalState? <NewTodoModal getNewData={getNewData} onAddTodo={onAddTodo} toggleModal={toggleModal}/> :null}
-      {devModeConst? <button onClick={onGenerateTodos}>Generate Todos</button>:null}
+      {devModeConst? <button onClick={devModeGenerator}>Generate Todos</button>:null}
     </>
   )
 }
