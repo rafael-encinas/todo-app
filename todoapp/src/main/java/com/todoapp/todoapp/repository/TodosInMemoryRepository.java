@@ -165,24 +165,6 @@ public class TodosInMemoryRepository {
 			updateTimesArrays();
 			ArrayList<Todo> filterdArray = (ArrayList)todos.clone();
 			
-			/* 
-			System.out.println(allParams);
-
-			//Sort by priority
-			if(allParams.containsKey("sortByPriority")) filterdArray = sortByPriority(filterdArray, allParams.get("sortByPriority"));
-
-			//Sort by date
-			if(allParams.containsKey("sortByDate")) filterdArray = sortByDate(filterdArray, allParams.get("sortByDate"));
-
-			//Filter by priority
-			if(allParams.containsKey("priority")) filterdArray = filterByPriority(filterdArray, allParams.get("priority"));
-			
-			//Filter by state (done/undone)
-			if(allParams.containsKey("state")) filterdArray = filterByState(filterdArray, allParams.get("state"));
-
-			//Filter by text
-			if(allParams.containsKey("text")) filterdArray = filterByText(filterdArray, allParams.get("text"));
-			*/
 			return filterdArray;
 		}
 

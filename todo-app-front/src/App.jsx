@@ -42,12 +42,6 @@ function App() {
   
 
   function getNewData(){
-    console.log("Time to get data!");
-    //Create get request
-
-    console.log("Sort: ");
-    console.log(sort);
-
     let requestString = `page=${page}&priority=${filters.priority}&state=${filters.state}&text=${filters.text}`;
     if(sort.sortByPrioirty != null){
       requestString += `&sortByPriority=${sort.sortByPrioirty}`;
@@ -63,13 +57,22 @@ function App() {
     }
     
     fetch(apiUrl + `/api/todos?${requestString}`, requestOptions)
-      .then(response=>response.json())
-      .then(data=> {
+    .then(response => {
+      if (!response.ok) {
+          throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
         console.log(data);
         dispatch(updateData(data.data));
         dispatch(updateMetrics(data.metrics));
         dispatch(updatePagination(data.pagination));
-      })
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+        alert('Failed to fetch new data. Please try again later.');
+    });
   }
 
   return (

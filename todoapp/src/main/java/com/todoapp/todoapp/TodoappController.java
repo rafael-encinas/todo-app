@@ -63,7 +63,7 @@ public class TodoappController {
 			} else{
 				todoPostError.setText("Error: Text must have between 1 and 120 characters. Try again");
 				todoPostError.setId(-1);
-				return ResponseEntity.ok(todoPostError);
+				return ResponseEntity.badRequest().body(todoPostError);
 			}
 			
 			boolean prioritySetCheck = false;
@@ -72,10 +72,14 @@ public class TodoappController {
 			} else{
 				todoPostError.setText("Error: Priority must between 0 and 2. Try again");
 				todoPostError.setId(-1);
-				return ResponseEntity.ok(todoPostError);
+				return ResponseEntity.badRequest().body(todoPostError);
 			}
-			return ResponseEntity.ok(repository.saveTodo(todo));
-
+			Todo responseTodo = repository.saveTodo(todo);
+			if(responseTodo  == null){
+				return ResponseEntity.badRequest().body(responseTodo);
+			} else{
+				return ResponseEntity.ok(responseTodo);
+			}
 		}
 
 		@PutMapping("/{id}")
@@ -106,19 +110,34 @@ public class TodoappController {
 
 		@PostMapping("/{id}/done")
 		public ResponseEntity<Todo> markDone(@PathVariable int id) {
-			return ResponseEntity.ok(repository.markDone(id));
+			Todo responseTodo = repository.markDone(id);
+			if(responseTodo.getId() == -1){
+				return ResponseEntity.notFound().build();
+			} else{
+				return ResponseEntity.ok(responseTodo);
+			}
 		}
 		
 		//Put /todos/{id}/undone to mark "todo" as undone
 
 		@PutMapping("/{id}/undone")
 		public ResponseEntity<Todo> markUndone(@PathVariable int id) {
-			return ResponseEntity.ok(repository.markUndone(id));
+			Todo responseTodo = repository.markUndone(id);
+			if(responseTodo.getId() == -1){
+				return ResponseEntity.notFound().build();
+			} else{
+				return ResponseEntity.ok(responseTodo);
+			}
 		}
 
 		@DeleteMapping(value = "/{id}")
 		public ResponseEntity<Todo> deleteTodo(@PathVariable("id") int id){
-			return ResponseEntity.ok(repository.deleteTodo(id));
+			Todo responseTodo = repository.deleteTodo(id);
+			if(responseTodo.getId() == -1){
+				return ResponseEntity.notFound().build();
+			} else{
+				return ResponseEntity.ok(responseTodo);
+			}
 		}
     
 }

@@ -9,7 +9,6 @@ export function useTodo(){
     const page = useSelector((state)=> state.pagination.requestPage.page);
     const apiUrl = import.meta.env.VITE_API_URL;
 
-    //const sortDateTest = useSelector((state) => state.todos.sortDateTest);
     const dispatch = useDispatch();
 
     //Only runs one time for initial rendering, gets all todos with no filters
@@ -19,53 +18,55 @@ export function useTodo(){
             headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
           } 
         fetch(apiUrl + `/api/todos`, requestOptions)
-        .then(response=>response.json())
-        .then(data=> {
-            //console.log("Got data from the useEffect!");
-          //console.log(data);
-          dispatch(updateData(data.data));
-          dispatch(updateMetrics(data.metrics));
-          dispatch(updatePagination(data.pagination));
+        .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
         })
+        .then(data => {
+            dispatch(updateData(data.data));
+            dispatch(updateMetrics(data.metrics));
+            dispatch(updatePagination(data.pagination));
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            alert('Failed to fetch the filtered data. \nPlease make sure the backend server is running.');
+        });
     }, [0]);
 
     const onGetFilteredData = (filters, sort, requestPage)=>{
         //Filters, sort, and page should come from invocation
-      /*
-        console.log("**************************")
-        console.log("From inside useTodo:")
-        console.log(filters);
-        console.log(sort);
-        console.log("Page: " + requestPage);
-      */
         if(requestPage === undefined){
           requestPage = 1;
         }
-
-
         let requestString = `page=${requestPage}&priority=${filters.priority}&state=${filters.state}&text=${filters.text}`;
         if(sort.sortByPriority != null){
         requestString += `&sortByPriority=${sort.sortByPriority}`;
         }
-
         if(sort.sortByDate != null){
         requestString += `&sortByDate=${sort.sortByDate}`;
         }
-
-        //console.log("RequestString: " + requestString);
-
         const requestOptions = {
             method: 'GET',
             headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
           }
         fetch(apiUrl + `/api/todos?${requestString}`, requestOptions)
-        .then(response=>response.json())
-        .then(data=> {
-          //console.log(data);
-          dispatch(updateData(data.data));
-          dispatch(updateMetrics(data.metrics));
-          dispatch(updatePagination(data.pagination));
+        .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
         })
+        .then(data => {
+            dispatch(updateData(data.data));
+            dispatch(updateMetrics(data.metrics));
+            dispatch(updatePagination(data.pagination));
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            alert('Failed to fetch the filtered data. \nPlease make sure the backend server is running.');
+        });
     }
 
     //Post todo to API
@@ -76,89 +77,114 @@ export function useTodo(){
             body: JSON.stringify({text: text, dueDate: dueDate, doneState: false, priority: priority})
           };
           fetch(apiUrl + '/api/todos', requestOptions)
-              .then(response => response.json())
-              .then(data => {
-                //console.log(data)
-                if(data.id<=-1){
-                  alert(data.text);
+            .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok');
+              }
+              return response.json();
+            })
+            .then(data => {
+                if (data.id <= -1) {
+                    alert(data.text);
                 }
-              });
-
-              setTimeout(
-                () => onGetFilteredData(filters, sort, page), 
-                100
-              );
-    })
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                alert('Failed to add the todo. \nPlease make sure the backend server is running.');
+            })
+            .finally(() => {
+                setTimeout(
+                    () => onGetFilteredData(filters, sort, page), 
+                    100
+                );
+            });
+    });
 
     const onUpdateTodo = ((text, dueDate, priority, id) =>{
-      //console.log("dueDate from hook: " + dueDate)
       const requestOptions = {
           method: 'PUT',
           headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
           body: JSON.stringify({text: text, dueDate: dueDate, priority: priority})
         };
         fetch(apiUrl + `/api/todos/${id}`, requestOptions)
-            .then(response => response.json())
-            .then(data => {
-              //console.log(data)
-              if(data.id<=-1){
-                alert(data.text);
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+              if (data.id <= -1) {
+                  alert(data.text);
               }
+          })
+          .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+              alert('Failed to update the todo. Please try again later.');
+          })
+          .finally(() => {
               setTimeout(
-                () => onGetFilteredData(filters, sort, page), 
-                100
+                  () => onGetFilteredData(filters, sort, page), 
+                  100
               );
-            });
-           
-    })
+          });
+    });
 
     const onMarkTodo = ((id) =>{
-
-      //console.log("Setting todo as DONE from inside hook!")
       const requestOptions = {
           method: 'POST',
           headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
           body: JSON.stringify({})
         };
         fetch(apiUrl+ `/api/todos/${id}/done`, requestOptions)
-            .then(response => response.json())
-            .then(data => {
-              //console.log(data)
-              if(data.id<=-1){
-                alert(data.text);
-              }
-              setTimeout(
+        .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            alert('Failed to mark the todo as done. Please try again later.');
+        })
+        .finally(() => {
+            setTimeout(
                 () => onGetFilteredData(filters, sort, page), 
                 100
-              );
-            });
-           
-    })
+            );
+        });
+    });
 
     const onUnmarkTodo = ((id) =>{
-
-      //console.log("Setting todo as undone from inside hook!")
       const requestOptions = {
           method: 'PUT',
           headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
           body: JSON.stringify({})
         };
         fetch(apiUrl + `/api/todos/${id}/undone`, requestOptions)
-            .then(response => response.json())
-            .then(data => {
-              //console.log(data)
-              if(data.id<=-1){
-                alert(data.text);
-              }
-              setTimeout(
+        .then(response => {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+            alert('Failed to unmark the todo. Please try again later.');
+        })
+        .finally(() => {
+            setTimeout(
                 () => onGetFilteredData(filters, sort, page), 
                 100
-              );
-            });
-           
+            );
+        });
     });
-
-
 
     const onDeleteTodo = ((id)=>{
         const requestOptions = {
@@ -166,22 +192,26 @@ export function useTodo(){
             headers: {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
           };
           fetch(apiUrl + `/api/todos/${id}`, requestOptions)
-          .then(response => response.json())
-          .then(data => {
-            //console.log(data)
-            if(data.id<=-1){
-              alert(data.text);
+          .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
+            return response.json();
+          })
+          .then(data => {
+              console.log('Success:', data);
+          })
+          .catch(error => {
+              console.error('There was a problem with the fetch operation:', error);
+              alert('Failed to delete the todo. Please try again later.');
+          })
+          .finally(() => {
+              setTimeout(
+                  () => onGetFilteredData(filters, sort, page), 
+                  100
+              );
           });
-          setTimeout(
-            () => onGetFilteredData(filters, sort, page), 
-            100
-          );
-    })
-
+    });
 
     return { onGetFilteredData, onAddTodo, onDeleteTodo, onUpdateTodo, onUnmarkTodo, onMarkTodo }
-
-    //const 
-        
 }
