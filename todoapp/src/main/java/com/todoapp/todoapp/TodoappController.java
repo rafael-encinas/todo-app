@@ -3,6 +3,7 @@ package com.todoapp.todoapp;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,11 +22,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
+
 @RestController
-@CrossOrigin
+//@CrossOrigin
 @RequestMapping("/api/todos")
 public class TodoappController {
-    
     
 		private TodosInMemoryRepository repository = new TodosInMemoryRepository();
 
@@ -33,7 +34,7 @@ public class TodoappController {
 			this.repository = repository;
 		}
 
-		@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5501", "http://127.0.0.1:5501"})
+		//@CrossOrigin(origins = allowedOrigins)
 		@GetMapping
 		public ResponseEntity<Response> findPagination(@RequestParam Map<String,String> allParams){
 			Response response = repository.findPagination(allParams);

@@ -98,10 +98,10 @@ public class TodosInMemoryRepository {
 				overallAverage = tempSum/howManyCalculations;
 			}
 
-			System.out.println("Averaga overall time: "+ overallAverage);
-			System.out.println("Low: " + lowAverage);
-			System.out.println("Medium: " + medAverage);
-			System.out.println("High: " + highAverage);
+			//System.out.println("Averaga overall time: "+ overallAverage);
+			///System.out.println("Low: " + lowAverage);
+			//System.out.println("Medium: " + medAverage);
+			//System.out.println("High: " + highAverage);
 		}
 
 		private LocalDateTime stringToLDT(String date){
@@ -240,7 +240,7 @@ public class TodosInMemoryRepository {
 		}
 		
 		private ArrayList<Todo> filterByText(ArrayList<Todo> arraylist, String text){
-			System.out.println("Filter text: " + text);
+			//System.out.println("Filter text: " + text);
 			if(text.length()<=0){
 				return arraylist;
 			}
@@ -270,7 +270,7 @@ public class TodosInMemoryRepository {
 
 			updateTimesArrays();
 			ArrayList<Todo> filterdArray = (ArrayList)todos.clone();
-			System.out.println(allParams);
+			//System.out.println(allParams);
 			//Sort by priority
 			if(allParams.containsKey("sortByPriority")) filterdArray = sortByPriority(filterdArray, allParams.get("sortByPriority"));
 			//Sort by date
@@ -296,21 +296,12 @@ public class TodosInMemoryRepository {
 			if(toIndex>filterdArray.size()){
 				toIndex = filterdArray.size();
 			}
-			System.out.println("******************************");
-			System.out.println("CurrentPage: " + currentPage);
-			System.out.println("FromIndex: " + fromIndex);
-			System.out.println("ToIndex: " + toIndex);
 
 			List<Todo> paginatedList = filterdArray.subList(fromIndex, toIndex);
 			int totalPages = (int) Math.ceil(filterdArray.size()/10.0);
 			//null values kept crashing the API, handle -1 and -2 values on the frontend
 			Integer nextPage = currentPage+1 <= totalPages ? currentPage+1 : -1;
 			Integer prevPage = currentPage-1 >= 1 ? currentPage-1 : -2;
-			
-			System.out.println("******************************");
-			System.out.println("TotalPages: " + totalPages);
-			System.out.println("NetPage: " + nextPage);
-			System.out.println("PrevPage: " + prevPage);
 			
 			Pagination pagination = new Pagination(todos.size(),filterdArray.size(),currentPage, totalPages, nextPage, prevPage);
 
@@ -327,26 +318,26 @@ public class TodosInMemoryRepository {
 			}
 			
 		public Todo updateTodo(int id, Todo todo){
-			System.out.println("Trying to update todo with id: " + id);
+			//System.out.println("Trying to update todo with id: " + id);
 			//Look for todo with id=id, gets a -1 if not found
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
-				System.out.println("Found element with id: " + id + " at index: " +elementIndex);
+				//System.out.println("Found element with id: " + id + " at index: " +elementIndex);
 				todos.get(elementIndex).setText(todo.getText());
 				todos.get(elementIndex).setDueDate(todo.getDueDate());
 				todos.get(elementIndex).setPriority(todo.getPriority());
 			} else{
-				System.out.println("Couldn't find element with id: "+ id);
+				//System.out.println("Couldn't find element with id: "+ id);
 				//return "Error: could not find To Do with id: '" +id +"'.";
 			}
 			return todos.get(elementIndex);
 		}
 
 		public Todo markDone(int id){
-			System.out.println("Trying to mark todo as done for id: " + id);
+			//System.out.println("Trying to mark todo as done for id: " + id);
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
-				System.out.println("Found element with id: " + id + " at index: " +elementIndex);
+				//System.out.println("Found element with id: " + id + " at index: " +elementIndex);
 				todos.get(elementIndex).setDoneState(true);
 				todos.get(elementIndex).setDoneDate(ldtToString(LocalDateTime.now()));
 				timeDiffString(todos.get(elementIndex).getCreationDate(), todos.get(elementIndex).getDoneDate());
@@ -360,15 +351,15 @@ public class TodosInMemoryRepository {
 		} 
 
 		public Todo markUndone(int id){
-			System.out.println("Trying to mark todo as undone for id: " + id);
+			//System.out.println("Trying to mark todo as undone for id: " + id);
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
-				System.out.println("Found element with id: " + id + " at index: " +elementIndex);
+				//System.out.println("Found element with id: " + id + " at index: " +elementIndex);
 				todos.get(elementIndex).setDoneState(false);
 				todos.get(elementIndex).setDoneDate(null);
 				todos.get(elementIndex).setDoneDate(null);
 			} else{
-				System.out.println("Couldn't find element with id: "+ id);
+				//System.out.println("Couldn't find element with id: "+ id);
 				Todo todoError = new Todo();
 				todoError.setText("Error: couldn't find To Do with id: " + id + ", please try a different id.");
 				todoError.setId(-1);
