@@ -300,17 +300,17 @@ public class TodosInMemoryRepository {
 			}
 			
 		public Todo updateTodo(int id, Todo todo){
-			//System.out.println("Trying to update todo with id: " + id);
 			//Look for todo with id=id, gets a -1 if not found
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
-				//System.out.println("Found element with id: " + id + " at index: " +elementIndex);
 				todos.get(elementIndex).setText(todo.getText());
 				todos.get(elementIndex).setDueDate(todo.getDueDate());
 				todos.get(elementIndex).setPriority(todo.getPriority());
 			} else{
-				//System.out.println("Couldn't find element with id: "+ id);
-				//return "Error: could not find To Do with id: '" +id +"'.";
+				Todo todoError = new Todo();
+				todoError.setText("Error: couldn't find To Do with id: " + id + ", please try a different id.");
+				todoError.setId(-1);
+				return todoError;
 			}
 			return todos.get(elementIndex);
 		}
@@ -319,7 +319,6 @@ public class TodosInMemoryRepository {
 			//System.out.println("Trying to mark todo as done for id: " + id);
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
-				//System.out.println("Found element with id: " + id + " at index: " +elementIndex);
 				todos.get(elementIndex).setDoneState(true);
 				todos.get(elementIndex).setDoneDate(ldtToString(LocalDateTime.now()));
 				timeDiffString(todos.get(elementIndex).getCreationDate(), todos.get(elementIndex).getDoneDate());

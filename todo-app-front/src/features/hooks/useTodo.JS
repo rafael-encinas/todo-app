@@ -8,6 +8,17 @@ export function useTodo(){
     const sort = useSelector((state)=> state.todos.sort);
     const page = useSelector((state)=> state.pagination.requestPage.page);
     const apiUrl = import.meta.env.VITE_API_URL;
+    const dictionary = {
+      errors:{
+        DELETE_ERROR: "Failed to delete the todo. Please try again later.",
+        TODO_NOT_FOUND_UNDONE: "Failed to unmark the todo. Please try again later.",
+        TODO_NOT_FOUND_DONE: "Failed to mark the todo as done. Please try again later.",
+        TODO_NOT_UPDATED: "Failed to update the todo. Please try again later.",
+        WRONG_PRIORITY: "Priority must be a number between 0 and 2.",
+        WRONG_TEXT_LENGTH: "Text must be between 1 and 120 characters long."
+      }
+    }
+    let customErrorCode = null;
 
     const dispatch = useDispatch();
 
@@ -31,7 +42,7 @@ export function useTodo(){
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
-            alert('Failed to fetch the filtered data. \nPlease make sure the backend server is running.');
+            alert('Failed to fetch the data. \nPlease make sure the backend server is running.');
         });
     }, [0]);
 
@@ -65,7 +76,7 @@ export function useTodo(){
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);
-            alert('Failed to fetch the filtered data. \nPlease make sure the backend server is running.');
+            alert('Failed to fetch the data. \nPlease make sure the backend server is running.');
         });
     }
 
@@ -79,24 +90,19 @@ export function useTodo(){
           fetch(apiUrl + '/api/todos', requestOptions)
             .then(response => {
               if (!response.ok) {
-                  throw new Error('Network response was not ok');
+                customErrorCode = response.headers.get('Custom-Error-Code');
+                throw new Error(`Network response was not ok. Custom error code: ${customErrorCode}`);
               }
               return response.json();
             })
             .then(data => {
-                if (data.id <= -1) {
-                    alert(data.text);
-                }
+              console.log('Success:', data);
             })
             .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-                alert('Failed to add the todo. \nPlease make sure the backend server is running.');
+              displayError(error, customErrorCode);
             })
             .finally(() => {
-                setTimeout(
-                    () => onGetFilteredData(filters, sort, page), 
-                    100
-                );
+              callOnGetFilteredDataAfterTimeout();
             });
     });
 
@@ -109,24 +115,19 @@ export function useTodo(){
         fetch(apiUrl + `/api/todos/${id}`, requestOptions)
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+              customErrorCode = response.headers.get('Custom-Error-Code');
+              throw new Error(`Network response was not ok. Custom error code: ${customErrorCode}`);
             }
             return response.json();
           })
           .then(data => {
-              if (data.id <= -1) {
-                  alert(data.text);
-              }
+            console.log('Success:', data);
           })
           .catch(error => {
-              console.error('There was a problem with the fetch operation:', error);
-              alert('Failed to update the todo. Please try again later.');
+            displayError(error, customErrorCode);
           })
           .finally(() => {
-              setTimeout(
-                  () => onGetFilteredData(filters, sort, page), 
-                  100
-              );
+            callOnGetFilteredDataAfterTimeout();
           });
     });
 
@@ -139,7 +140,8 @@ export function useTodo(){
         fetch(apiUrl+ `/api/todos/${id}/done`, requestOptions)
         .then(response => {
           if (!response.ok) {
-              throw new Error('Network response was not ok');
+            customErrorCode = response.headers.get('Custom-Error-Code');
+            throw new Error(`Network response was not ok. Custom error code: ${customErrorCode}`);
           }
           return response.json();
         })
@@ -147,14 +149,10 @@ export function useTodo(){
             console.log('Success:', data);
         })
         .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-            alert('Failed to mark the todo as done. Please try again later.');
+          displayError(error, customErrorCode);
         })
         .finally(() => {
-            setTimeout(
-                () => onGetFilteredData(filters, sort, page), 
-                100
-            );
+          callOnGetFilteredDataAfterTimeout();
         });
     });
 
@@ -167,7 +165,8 @@ export function useTodo(){
         fetch(apiUrl + `/api/todos/${id}/undone`, requestOptions)
         .then(response => {
           if (!response.ok) {
-              throw new Error('Network response was not ok');
+            customErrorCode = response.headers.get('Custom-Error-Code');
+            throw new Error(`Network response was not ok. Custom error code: ${customErrorCode}`);
           }
           return response.json();
         })
@@ -175,14 +174,10 @@ export function useTodo(){
             console.log('Success:', data);
         })
         .catch(error => {
-            console.error('There was a problem with the fetch operation:', error);
-            alert('Failed to unmark the todo. Please try again later.');
+          displayError(error, customErrorCode);
         })
         .finally(() => {
-            setTimeout(
-                () => onGetFilteredData(filters, sort, page), 
-                100
-            );
+          callOnGetFilteredDataAfterTimeout();
         });
     });
 
@@ -194,24 +189,36 @@ export function useTodo(){
           fetch(apiUrl + `/api/todos/${id}`, requestOptions)
           .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+              customErrorCode = response.headers.get('Custom-Error-Code');
+              throw new Error(`Network response was not ok. Custom error code: ${customErrorCode}`);
             }
             return response.json();
           })
           .then(data => {
               console.log('Success:', data);
+              //checar bandera de error y mandar alert
           })
           .catch(error => {
-              console.error('There was a problem with the fetch operation:', error);
-              alert('Failed to delete the todo. Please try again later.');
+            displayError(error, customErrorCode);
+              //console.error('There was a problem with the fetch operation:', error);
+              //alert(dictionary.errors.DELETE_ERROR);
           })
           .finally(() => {
-              setTimeout(
-                  () => onGetFilteredData(filters, sort, page), 
-                  100
-              );
+            callOnGetFilteredDataAfterTimeout();
           });
     });
+
+    function displayError(error, customErrorCode){
+       console.log("There was a problem with the fetch operation:", error);
+       alert(dictionary.errors[customErrorCode]);
+    }
+
+    function callOnGetFilteredDataAfterTimeout(){
+      setTimeout(
+        () => onGetFilteredData(filters, sort, page), 
+        100
+      );
+    }
 
     return { onGetFilteredData, onAddTodo, onDeleteTodo, onUpdateTodo, onUnmarkTodo, onMarkTodo }
 }

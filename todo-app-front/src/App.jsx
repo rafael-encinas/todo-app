@@ -71,7 +71,7 @@ function App() {
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
-        alert('Failed to fetch new data. Please try again later.');
+        alert('Failed to fetch new data.\nPlease try again later.');
     });
   }
 
@@ -79,7 +79,7 @@ function App() {
     <>
     <div className='topContainer'>
       <SearchBar onGetFilteredData={onGetFilteredData} />
-      <NewToDoBtn   toggleModal={toggleModal}  />
+      <NewToDoBtn toggleModal={toggleModal}  />
       {
         todosArr.length>0?
         <ToDosTable onGetFilteredData={onGetFilteredData}  todosArr={todosArr} onDeleteTodo={onDeleteTodo} onUpdateTodo={onUpdateTodo} onMarkTodo={onMarkTodo} onUnmarkTodo={onUnmarkTodo} />

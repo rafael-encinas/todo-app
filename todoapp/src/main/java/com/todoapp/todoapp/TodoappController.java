@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -57,13 +58,16 @@ public class TodoappController {
 			int maxTextLength = 120;
 			int minTextLength = 1;
 			Todo todoPostError = new Todo();
+
 			boolean textLengthCheck = false;
 			if(todo.getText().length() <= maxTextLength && todo.getText().length() >= minTextLength) {
 				textLengthCheck = true;
 			} else{
 				todoPostError.setText("Error: Text must have between 1 and 120 characters. Try again");
 				todoPostError.setId(-1);
-				return ResponseEntity.badRequest().body(todoPostError);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.header("Custom-Error-Code", "WRONG_TEXT_LENGTH")
+				.build();
 			}
 			
 			boolean prioritySetCheck = false;
@@ -72,7 +76,9 @@ public class TodoappController {
 			} else{
 				todoPostError.setText("Error: Priority must between 0 and 2. Try again");
 				todoPostError.setId(-1);
-				return ResponseEntity.badRequest().body(todoPostError);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.header("Custom-Error-Code", "WRONG_PRIORITY")
+				.build();
 			}
 			Todo responseTodo = repository.saveTodo(todo);
 			if(responseTodo  == null){
@@ -93,7 +99,9 @@ public class TodoappController {
 			} else{
 				todoPostError.setText("Error: Text must have between 1 and 120 characters. Try again");
 				todoPostError.setId(-1);
-				return ResponseEntity.ok(todoPostError);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.header("Custom-Error-Code", "WRONG_TEXT_LENGTH")
+				.build();
 			}
 			boolean prioritySetCheck = false;
 			if(todo.getPriority() <= 2 && todo.getPriority() >= 0) {
@@ -101,10 +109,19 @@ public class TodoappController {
 			} else{
 				todoPostError.setText("Error: Priority must between 0 and 2. Try again");
 				todoPostError.setId(-1);
-				return ResponseEntity.ok(todoPostError);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+				.header("Custom-Error-Code", "WRONG_PRIORITY")
+				.build();
 			}
-			return ResponseEntity.ok(repository.updateTodo(id, todo));
+			Todo responseTodo = repository.updateTodo(id, todo);
+			if(responseTodo.getId() == -1){
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.header("Custom-Error-Code", "TODO_NOT_UPDATED")
+				.build();
+			} else{
+				return ResponseEntity.ok(responseTodo);
 			}
+		}
 
 		//Post /todos/{id}/done to mark "todo" as done
 
@@ -112,7 +129,9 @@ public class TodoappController {
 		public ResponseEntity<Todo> markDone(@PathVariable int id) {
 			Todo responseTodo = repository.markDone(id);
 			if(responseTodo.getId() == -1){
-				return ResponseEntity.notFound().build();
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.header("Custom-Error-Code", "TODO_NOT_FOUND_DONE")
+				.build();
 			} else{
 				return ResponseEntity.ok(responseTodo);
 			}
@@ -124,7 +143,9 @@ public class TodoappController {
 		public ResponseEntity<Todo> markUndone(@PathVariable int id) {
 			Todo responseTodo = repository.markUndone(id);
 			if(responseTodo.getId() == -1){
-				return ResponseEntity.notFound().build();
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.header("Custom-Error-Code", "TODO_NOT_FOUND_UNDONE")
+				.build();
 			} else{
 				return ResponseEntity.ok(responseTodo);
 			}
@@ -134,7 +155,9 @@ public class TodoappController {
 		public ResponseEntity<Todo> deleteTodo(@PathVariable("id") int id){
 			Todo responseTodo = repository.deleteTodo(id);
 			if(responseTodo.getId() == -1){
-				return ResponseEntity.notFound().build();
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .header("Custom-Error-Code", "DELETE_ERROR")
+                    .build();
 			} else{
 				return ResponseEntity.ok(responseTodo);
 			}

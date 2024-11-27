@@ -5,13 +5,9 @@ import todos from "../todos/todos";
 
 
 export function ToDoRow({ onGetFilteredData, onDeleteTodo, toDo, onUpdateTodo, onMarkTodo, onUnmarkTodo }){
-    //const { onDeleteTodo } = useTodo();
     const [updateTodoModalState, setUpdateTodoModalState] = useState(false);
     const [todoState, setTodoState] = useState(toDo.doneState)
-    //const filters = useSelector((state)=> state.todos.filters);
-    //const sort = useSelector((state)=> state.todos.sort);
     const [priorityText, setPriorityText] = useState("Low");
-      //const page = useSelector((state)=> state.pagination.requestPage.page);
     const page = 1;
     let checked = toDo.doneState?"checked":null;
 
