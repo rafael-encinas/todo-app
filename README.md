@@ -1,33 +1,8 @@
 # Todo App project
-
-The main objective of this project is to develop a functional full stack To Do app, using React for the front end, and Spring Boot for the back end.
-
-## Setting up the projects
-Once you've made a local copy of this repository, you must use run the following commands on each particular directory.
-### Front end
-To install dependencies:
-```
-npm install
-```
-To run the project:
-```
-npm run start
-```
-To run the tests:
-```
-npm run test
-```
-
-### Back end
-To run the project:
-```
-mvn spring-boot:run
-```
-To run the tests:
-```
-mvn test
-```
-# GenAI:
+## Requirements
+To be able to run the project, the following software must be installed:
+-  Node v16
+- npm v28
 ## Running in Development Mode
 To run the full stack To Do app in development mode, follow these steps:
 
@@ -97,7 +72,7 @@ Response:
 - `200 OK`: Returns a paginated list of todos.
 - Response object.
 
-Note: If both sortByPriority and sortByDate query parameters are set, the  Todos will appear sorted first by date and then by priority.
+Note: If both sortByPriority and sortByDate query parameters are set, Todos will appear sorted first by date and then by priority.
 
 ### Get All Todos
 URL: `/api/todos/getall`  
@@ -118,12 +93,37 @@ Method: `POST`
 Description: Saves a new todo.  
 
 Request Body:
-- `Todo` object.  
-
+- `Todo` object:
+  ```json
+  {
+    "text": string,       //Between 1 and 120 characters
+    "dueDate": string,    //Date in format "YYYY-MM-DD", or null
+    "doneState": boolean, //Initially must be sent as false
+    "priority": integer,  //low-> 0, medium -> 1, high -> 2
+  } 
+- Todo body example:
+  ```json
+  {
+    "text": "Low priority todo, don't worry too much",
+    "dueDate": "2005-05-01",
+    "doneState": false,
+    "priority": 1,
+  }
 Response:
-- `200 OK`: Returns the saved todo or an error message if validation fails.
-- `Todo` object.
-
+- `200 OK`: Returns the saved todo.
+  ```json
+    {
+      "id": 1,
+      "text": "Low priority todo, don't worry too much",
+      "dueDate": "2005-05-01",
+      "doneState": false,
+      "doneDate": null,
+      "creationDate": "2024-11-27 10:39:17",
+      "priority": 1,
+    }
+-  `400 Bad Request`: Returns an error with a Custom-Error-Code header:
+    - Headers:
+      - `Custom-Error-Code`: `WRONG_TEXT_LENGTH` | `WRONG_PRIORITY`
 ### Update Todo
 URL: `/api/todos/{id}`  
 Method: `PUT`  
@@ -131,11 +131,35 @@ Description: Updates an existing todo.
 
 Path Variable:
 - `id` (int): The ID of the todo to update.
+
 Request Body:
-- `Todo` object.
+- `Todo` object example:
+  ```json
+  {
+    "text": "Updated the text and priority",
+    "dueDate": "2005-05-01",
+    "doneState": false,
+    "priority": 2,
+  }
 Response:
 - `200 OK`: Returns the updated todo.
 - `Todo` object.
+  ```json
+      {
+        "id": 1,
+        "text": "Updated the text and priority",
+        "dueDate": "2005-05-01",
+        "doneState": false,
+        "doneDate": null,
+        "creationDate": "2024-11-27 10:39:17",
+        "priority": 2,
+      }
+-  `400 Bad Request`: Returns an error with a Custom-Error-Code header:
+    - Headers:
+      - `Custom-Error-Code`: `WRONG_TEXT_LENGTH` | `WRONG_PRIORITY`      
+-  `404 Not Found`: Returns an error with a Custom-Error-Code header:
+    - Headers:
+      - `Custom-Error-Code`: `TODO_NOT_UPDATED`         
 
 ### Mark Todo as Done   
 URL: `/api/todos/{id}/done`   
@@ -147,8 +171,20 @@ Path Variable:
 
 Response:
 - `200 OK`: Returns the updated todo.
-- `Todo` object.
-
+- `Todo` object:
+  ```json
+      {
+        "id": 1,
+        "text": "Updated the text and priority",
+        "dueDate": "2005-05-01",
+        "doneState": true,
+        "doneDate": "2024-11-27 11:00:19",
+        "creationDate": "2024-11-27 10:39:17",
+        "priority": 2,
+      }
+-  `404 Not Found`: Returns an error with a Custom-Error-Code header:
+    - Headers:
+      - `Custom-Error-Code`: `TODO_NOT_FOUND_DONE`  
 ### Mark Todo as Undone
 URL: `/api/todos/{id}/undone`   
 Method: `PUT`   
@@ -159,8 +195,20 @@ Path Variable:
 
 Response:
 - `200 OK`: Returns the updated todo.
-- `Todo` object.
-
+- `Todo` object:
+  ```json
+      {
+        "id": 1,
+        "text": "Updated the text and priority",
+        "dueDate": "2005-05-01",
+        "doneState": false,
+        "doneDate": null,
+        "creationDate": "2024-11-27 10:39:17",
+        "priority": 2,
+      }
+-  `404 Not Found`: Returns an error with a Custom-Error-Code header:
+    - Headers:
+      - `Custom-Error-Code`: `TODO_NOT_FOUND_UNDONE`  
 ### Delete Todo
 URL: `/api/todos/{id}`   
 Method: `DELETE`  
@@ -171,4 +219,24 @@ Path Variable:
 
 Response:
 - `200 OK`: Returns the deleted todo.
-- `Todo` object.
+- `Todo` object:
+  ```json
+      {
+        "id": 1,
+        "text": "Updated the text and priority",
+        "dueDate": "2005-05-01",
+        "doneState": false,
+        "doneDate": null,
+        "creationDate": "2024-11-27 10:39:17",
+        "priority": 2,
+      }
+-  `404 Not Found`: Returns an error with a Custom-Error-Code header:
+    - Headers:
+      - `Custom-Error-Code`: `DELETE_ERROR`  
+### Error Codes
+- `WRONG_TEXT_LENGTH`: The text length is not within the allowed range (1-120 characters).
+- `WRONG_PRIORITY`: The priority is not within the allowed range (0-2).
+- `TODO_NOT_UPDATED`: The requested todo item was not found and couldn't be updated.
+- `TODO_NOT_FOUND_DONE`: The requested todo item was not found and couldn't be marked as done.
+- `TODO_NOT_FOUND_UNDONE`: The requested todo item was not found and couldn't be marked as undone.
+- `DELETE_ERROR`: The requested todo item was not found and couldn't be deleted.
