@@ -70,9 +70,17 @@ export function useTodo(){
           return response.json();
         })
         .then(data => {
+          if(data.data.length === 0 && requestPage > 1){
+            console.log("No data found, fetching previous page");
+            data.pagination.current_page = requestPage-1;
+            dispatch(updatePagination(data.pagination));
+            onGetFilteredData(filters, sort, requestPage-1);
+          } else{
             dispatch(updateData(data.data));
             dispatch(updateMetrics(data.metrics));
             dispatch(updatePagination(data.pagination));
+          }
+            
         })
         .catch(error => {
             console.error('There was a problem with the fetch operation:', error);

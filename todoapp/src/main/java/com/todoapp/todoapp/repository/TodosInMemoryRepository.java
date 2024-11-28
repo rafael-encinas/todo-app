@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.todoapp.todoapp.models.Metrics;
 import com.todoapp.todoapp.models.Pagination;
@@ -58,17 +59,23 @@ public class TodosInMemoryRepository {
 			medPriorityTimes.clear();
 			highPriorityTimes.clear();
 			overallAverage=0;
-			for(int j=0; j<todos.size(); j++){
-				if(todos.get(j).isDoneState()){
-					if(todos.get(j).getPriority()==0){
-						//Get time difference in seconds and store it
-						lowPriorityTimes.add(timeDiffString(todos.get(j).getCreationDate(), todos.get(j).getDoneDate()));	
-					} else if(todos.get(j).getPriority()==1){
-						//Get time difference in seconds and store it
-						medPriorityTimes.add(timeDiffString(todos.get(j).getCreationDate(), todos.get(j).getDoneDate()));	
-					} else{
-						//Get time difference in seconds and store it
-						highPriorityTimes.add(timeDiffString(todos.get(j).getCreationDate(), todos.get(j).getDoneDate()));	
+			// Iterate through todos and update the priority time arrays
+			for (Todo todo : todos) {
+				if (todo.isDoneState()) {
+					long timeDiff = timeDiffString(todo.getCreationDate(), todo.getDoneDate());
+					switch (todo.getPriority()) {
+						case 0:
+							lowPriorityTimes.add(timeDiff);
+							break;
+						case 1:
+							medPriorityTimes.add(timeDiff);
+							break;
+						case 2:
+							highPriorityTimes.add(timeDiff);
+							break;
+						default:
+							// Handle unexpected priority values if necessary
+							break;
 					}
 				}
 			}
@@ -97,11 +104,6 @@ public class TodosInMemoryRepository {
 			if(howManyCalculations>0){
 				overallAverage = tempSum/howManyCalculations;
 			}
-
-			//System.out.println("Averaga overall time: "+ overallAverage);
-			///System.out.println("Low: " + lowAverage);
-			//System.out.println("Medium: " + medAverage);
-			//System.out.println("High: " + highAverage);
 		}
 
 		private LocalDateTime stringToLDT(String date){
@@ -168,69 +170,60 @@ public class TodosInMemoryRepository {
 			return filterdArray;
 		}
 
-		private ArrayList<Todo> sortByDate(ArrayList<Todo> arraylist, String sortByDate){
-			// - sortByDate, sooner dates first = "sooner", later dates first= anything else
-			if(sortByDate.equals("sooner")){
-				arraylist.sort(
-					Comparator.nullsLast(
-					(a, b) -> stringToLDT(a.getDueDate()+" 00:00:00").compareTo(stringToLDT(b.getDueDate()+" 00:00:00"))
-					)
-				);
-			} else if(sortByDate.equals("later")){
-				arraylist.sort(
-					Comparator.nullsLast(
-						(b, a) -> stringToLDT(a.getDueDate()+" 00:00:00").compareTo(stringToLDT(b.getDueDate()+" 00:00:00"))
-						)
-				);
+		private ArrayList<Todo> sortByDate(ArrayList<Todo> arraylist, String sortByDate) {
+			Comparator<Todo> comparator = Comparator.comparing(
+				todo -> stringToLDT(todo.getDueDate() + " 00:00:00"),
+				Comparator.nullsLast(Comparator.naturalOrder())
+			);
+
+			if (sortByDate.equals("later")) {
+				comparator = comparator.reversed();
 			}
+
+			arraylist.sort(comparator);
 			return arraylist;
 		}
 
-		private ArrayList<Todo> sortByPriority(ArrayList<Todo> arraylist, String sortByPriority){
-			// - sortByPriority, low=low, high=anything else;
-			if(sortByPriority.equals("low")){
-				arraylist.sort(
-					(a, b) -> String.valueOf(a.getPriority()).compareTo(String.valueOf(b.getPriority()))
-				);
-			} else{
-				arraylist.sort(
-					(b, a) -> String.valueOf(a.getPriority()).compareTo(String.valueOf(b.getPriority()))
-				);
+		private ArrayList<Todo> sortByPriority(ArrayList<Todo> arraylist, String sortByPriority) {
+			Comparator<Todo> comparator = Comparator.comparingInt(Todo::getPriority);
+			if (!sortByPriority.equals("low")) {
+				comparator = comparator.reversed();
 			}
+			arraylist.sort(comparator);
 			return arraylist;
 		}
 
-		private ArrayList<Todo> filterByPriority(ArrayList<Todo> arraylist, String priority){
-			// - priority: low=0, med=1, high=2, all=3
-			int priorityInt = Integer.valueOf(priority);
-			if(priorityInt>=3){
+		private ArrayList<Todo> filterByPriority(ArrayList<Todo> arraylist, String priority) {
+			int priorityInt = Integer.parseInt(priority);
+			if (priorityInt >= 3) {
 				return arraylist;
 			}
-			arraylist.removeIf(e -> e.getPriority() != priorityInt);
-			return arraylist;
+			return arraylist.stream()
+							.filter(e -> e.getPriority() == priorityInt)
+							.collect(Collectors.toCollection(ArrayList::new));
 		}
-		
-		private ArrayList<Todo> filterByState(ArrayList<Todo> arraylist, String state){
-			// - state:  undone=0, done=1, all=2,
+
+		private ArrayList<Todo> filterByState(ArrayList<Todo> arraylist, String state) {
+			// - state: undone=0, done=1, all=2,
 			int stateInt = Integer.valueOf(state);
-			if(stateInt>=2){
+			if (stateInt >= 2) {
 				return arraylist;
 			}
-			boolean doneState = stateInt>=1;
-			arraylist.removeIf(e -> e.isDoneState() != doneState);
-			return arraylist;
+			boolean doneState = stateInt >= 1;
+			return arraylist.stream()
+							.filter(e -> e.isDoneState() == doneState)
+							.collect(Collectors.toCollection(ArrayList::new));
 		}
-		
-		private ArrayList<Todo> filterByText(ArrayList<Todo> arraylist, String text){
-			//System.out.println("Filter text: " + text);
-			if(text.length()<=0){
+
+		private ArrayList<Todo> filterByText(ArrayList<Todo> arraylist, String text) {
+			if (text == null || text.isEmpty()) {
 				return arraylist;
 			}
-			// if todo.text doesn't contain text, remove from filtered array
-			arraylist.removeIf(e -> !e.getText().toLowerCase().contains(text.toLowerCase()));
-			return arraylist;
+			String lowerCaseText = text.toLowerCase();
+			return arraylist.stream()
+							.filter(e -> e.getText().toLowerCase().contains(lowerCaseText))
+							.collect(Collectors.toCollection(ArrayList::new));
 		}
-		
 		public Response findPagination(Map<String,String> allParams){			
 			/*
 			 * Return: 
@@ -264,11 +257,19 @@ public class TodosInMemoryRepository {
 			//Filter by text
 			if(allParams.containsKey("text")) filterdArray = filterByText(filterdArray, allParams.get("text"));
 			//filtered array must be split for pagination before being attached to response object
+			
 			int currentPage; 
 			if(allParams.containsKey("page")) {
 				currentPage = Integer.valueOf(allParams.get("page"));
 			} else{
 				currentPage = 1;
+			}
+			//If currentPage is higher than total number of pages, return previews page
+			if(currentPage>Math.ceil(filterdArray.size()/10.0)){
+				currentPage = (int) Math.ceil(filterdArray.size()/10.0);
+				if(currentPage==0){
+					currentPage=1;
+				}
 			}
 			//Number of elements per page= 10
 			int howManyElements = 10;
@@ -316,7 +317,6 @@ public class TodosInMemoryRepository {
 		}
 
 		public Todo markDone(int id){
-			//System.out.println("Trying to mark todo as done for id: " + id);
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
 				todos.get(elementIndex).setDoneState(true);
@@ -332,15 +332,12 @@ public class TodosInMemoryRepository {
 		} 
 
 		public Todo markUndone(int id){
-			//System.out.println("Trying to mark todo as undone for id: " + id);
 			int elementIndex = getIndexFromId(id);
 			if(elementIndex>-1){
-				//System.out.println("Found element with id: " + id + " at index: " +elementIndex);
 				todos.get(elementIndex).setDoneState(false);
 				todos.get(elementIndex).setDoneDate(null);
 				todos.get(elementIndex).setDoneDate(null);
 			} else{
-				//System.out.println("Couldn't find element with id: "+ id);
 				Todo todoError = new Todo();
 				todoError.setText("Error: couldn't find To Do with id: " + id + ", please try a different id.");
 				todoError.setId(-1);
@@ -356,7 +353,6 @@ public class TodosInMemoryRepository {
 				todoToDelete = todos.get(elementIndex);
 				todos.removeIf(e -> e.getId() == (id));
 			} else{
-				//todoToDelete.setText("Todo not found");
 				Todo todoError = new Todo();
 				todoError.setText("Error: couldn't find To Do with id: " + id + ", please try a different id.");
 				todoError.setId(-1);
