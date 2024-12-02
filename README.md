@@ -3,6 +3,26 @@
 To be able to run the project, the following software must be installed:
 -  Node v16
 - npm v28
+
+### Environment variables
+#### Front end
+To run the front end application, you need to create a .env file at the root of the todo-app-front directory. This file should contain the following environment variable.
+
+Example `.env` file:
+```
+VITE_API_URL=http://yourapiserver:port
+```
+#### Back end
+To run the backend, you need to add your projects front end origin to the "cors.allowed.origins" variable found at the `application.properties` file. 
+Make sure to replace the placeholder values with the actual values needed for your environment.
+Example `application.properties` file:
+```
+spring.application.name=todoapp
+server.port=9090
+cors.allowed.origins=http://localhost:8080,http://localhost:5501,http://127.0.0.1:5501
+```
+
+
 ## Running in Development Mode
 To run the full stack To Do app in development mode, follow these steps:
 
