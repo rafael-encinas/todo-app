@@ -52,6 +52,7 @@ export const devModeGenerator = (()=>{
       const randomIndex = Math.floor(Math.random() * priorities.length);
       return priorities[randomIndex];
     }
+    
     console.log(testData);
 
 

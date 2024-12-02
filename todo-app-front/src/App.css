@@ -1,10 +1,10 @@
-:root{
+:root {
   --white-color: rgba(255, 255, 255, 0.87);
   --darkgrey-color: rgb(61, 61, 61);
   --lightgrey-color: rgb(93, 93, 93);
 }
 
-body{
+body {
   margin: 0;
   padding: 0;
 }
@@ -24,27 +24,27 @@ body{
   box-sizing: border-box;
 }
 
-#devModeBtn{
-  position:absolute;
+#devModeBtn {
+  position: absolute;
   top: 0;
   left: 0;
 }
 
-.topContainer, .bottomContainer{
+.topContainer,
+.bottomContainer {
   width: 100%;
   display: flex;
-  /*flex-grow: 1;*/
   align-items: start;
   flex-direction: column;
   gap: 10px;
   position: relative;
 }
 
-.bottomContainer{
+.bottomContainer {
   align-items: end;
 }
 
-.searchBar{
+.searchBar {
   width: 100%;
   position: relative;
   box-sizing: border-box;
@@ -56,71 +56,70 @@ body{
   gap: 5px;
 }
 
-.generalBtn{
+.generalBtn {
   box-sizing: border-box;
   padding: 5px 15px;
   background-color: var(--darkgrey-color);
   border-radius: 5px;
   border: 1px solid var(--white-color);
   transition: 50ms;
-  &:hover{
+  &:hover {
     background-color: var(--lightgrey-color);
     cursor: pointer;
   }
-  &:active{
+  &:active {
     background-color: var(--darkgrey-color);
   }
 }
 
-.searchBtn{
+.searchBtn {
   position: absolute;
   right: 25px;
   bottom: 25px;
 }
 
-.newToDoBtn{
+.newToDoBtn {
   align-self: left;
 }
 
-.tableContainer{
+.tableContainer {
   overflow-x: auto;
   width: 100%;
-  & > table{
+  & > table {
     border: 1px solid var(--white-color);
     border-collapse: collapse;
     width: 100%;
   }
 }
 
-td{
+td {
   border: 1px solid var(--white-color);
   text-align: start;
   padding: 5px 10px;
 }
 
-.colState{
+.colState {
   width: 40px;
   text-align: center;
 }
 
-.colName{
+.colName {
   width: fit-content;
-
 }
 
-.colPriority{
+.colPriority {
   width: 80px;
 }
 
-.colDueDate{
+.colDueDate {
   width: 100px;
 }
 
-.colActions{
+.colActions {
   width: 150px;
 }
 
-.paginationControl{
+.paginationControl {
   margin-top: 50px;
   align-self: center;
 
@@ -129,12 +128,12 @@ td{
   border: 1px solid var(--white-color);
 }
 
-.paginationText{
+.paginationText {
   margin-top: 5px;
   font-size: smaller;
 }
 
-.metricsContainer{
+.metricsContainer {
   box-sizing: border-box;
   border: 1px solid var(--white-color);
   padding: 20px 40px;
@@ -146,7 +145,7 @@ td{
   align-items: start;
 }
 
-.newToDoModal{
+.newToDoModal {
   width: 450px;
   display: flex;
   flex-direction: column;
@@ -162,40 +161,40 @@ td{
   background-color: black;
 }
 
-.inputContainer{
+.inputContainer {
   display: flex;
   flex-direction: column;
   text-align: start;
 }
 
-.btnsContainer{
+.btnsContainer {
   display: flex;
   flex-direction: row;
   gap: 10px;
   justify-content: end;
-  & > .saveTodoBtn{
+  & > .saveTodoBtn {
     transition: 50ms;
     background-color: #1b69dc;
-    &:hover{
+    &:hover {
       background-color: #3e86f1;
     }
-    &:active{
+    &:active {
       background-color: #1b69dc;
     }
   }
 }
 
-.currentPage{
-    transition: 50ms;
+.currentPage {
+  transition: 50ms;
+  background-color: #1b69dc;
+  &:hover {
+    background-color: #3e86f1;
+  }
+  &:active {
     background-color: #1b69dc;
-    &:hover{
-      background-color: #3e86f1;
-    }
-    &:active{
-      background-color: #1b69dc;
-    }
+  }
 }
 
-.noDataContainer{
+.noDataContainer {
   width: 100%;
 }

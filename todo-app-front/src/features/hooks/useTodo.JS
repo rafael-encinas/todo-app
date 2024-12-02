@@ -8,6 +8,8 @@ export function useTodo(){
     const sort = useSelector((state)=> state.todos.sort);
     const page = useSelector((state)=> state.pagination.requestPage.page);
     const apiUrl = import.meta.env.VITE_API_URL;
+
+    
     const dictionary = {
       errors:{
         DELETE_ERROR: "Failed to delete the todo. Please try again later.",
@@ -18,6 +20,8 @@ export function useTodo(){
         WRONG_TEXT_LENGTH: "Text must be between 1 and 120 characters long."
       }
     }
+
+
     let customErrorCode = null;
 
     const dispatch = useDispatch();
